@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trono</title>
+<meta name="description" content="As músicas do King, separadas por gênero, para ouvir e compartilhar.">
+<meta name="theme-color" content="#0d0b08">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icone-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="app">
+  <aside class="lateral">
+    <a class="marca" href="#/"><span class="marca-ico"><i data-lucide="crown"></i></span>Trono</a>
+    <nav class="menu">
+      <a href="#/" data-rota="inicio"><i data-lucide="house"></i>Início</a>
+      <a href="#/buscar" data-rota="buscar"><i data-lucide="search"></i>Buscar</a>
+      <a href="#/favoritas" data-rota="favoritas"><i data-lucide="heart"></i>Favoritas</a>
+    </nav>
+    <div class="menu-titulo">Gêneros</div>
+    <nav class="menu generos-menu" id="generosMenu"></nav>
+  </aside>
+
+  <main class="conteudo" id="conteudo" tabindex="-1"></main>
+
+  <nav class="abas">
+    <a href="#/" data-rota="inicio"><i data-lucide="house"></i><span>Início</span></a>
+    <a href="#/buscar" data-rota="buscar"><i data-lucide="search"></i><span>Buscar</span></a>
+    <a href="#/favoritas" data-rota="favoritas"><i data-lucide="heart"></i><span>Favoritas</span></a>
+  </nav>
+
+  <footer class="player" id="player" hidden>
+    <button class="p-info" id="pInfo" aria-label="Abrir player">
+      <span class="capa p-capa" id="pCapa"></span>
+      <span class="p-textos"><strong id="pTitulo"></strong><small id="pArtista"></small></span>
+    </button>
+    <div class="p-centro">
+      <div class="p-botoes">
+        <button class="ico" id="bAleatorio" aria-label="Aleatório"><i data-lucide="shuffle"></i></button>
+        <button class="ico" id="bAnterior" aria-label="Anterior"><i data-lucide="skip-back"></i></button>
+        <button class="ico play" id="bPlay" aria-label="Tocar"><i data-lucide="play"></i></button>
+        <button class="ico" id="bProxima" aria-label="Próxima"><i data-lucide="skip-forward"></i></button>
+        <button class="ico" id="bRepetir" aria-label="Repetir"><i data-lucide="repeat"></i></button>
+      </div>
+      <div class="p-barra">
+        <span id="tAtual">0:00</span>
+        <input type="range" id="progresso" min="0" max="1000" value="0" aria-label="Posição da música">
+        <span id="tTotal">0:00</span>
+      </div>
+    </div>
+    <div class="p-direita">
+      <button class="ico" id="bGenero" aria-label="Votar no gênero" title="Votar no gênero" hidden><i data-lucide="tag"></i></button>
+      <button class="ico" id="bFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
+      <button class="ico" id="bCompartilhar" aria-label="Compartilhar"><i data-lucide="share-2"></i></button>
+      <i data-lucide="volume-2" class="vol-ico"></i>
+      <input type="range" id="volume" min="0" max="100" value="90" aria-label="Volume">
+    </div>
+    <button class="ico p-play-mini" id="bPlayMini" aria-label="Tocar"><i data-lucide="play"></i></button>
+    <div class="p-mini-barra"><span id="miniBarra"></span></div>
+  </footer>
+</div>
+
+<div class="tela-cheia" id="telaCheia" hidden>
+  <div class="tc-topo">
+    <button class="ico" id="tcFechar" aria-label="Fechar"><i data-lucide="chevron-down"></i></button>
+    <span id="tcGenero"></span>
+    <button class="ico" id="tcCompartilhar" aria-label="Compartilhar"><i data-lucide="share-2"></i></button>
+  </div>
+  <div class="capa tc-capa" id="tcCapa"></div>
+  <div class="tc-linha">
+    <div><h2 id="tcTitulo"></h2><p id="tcArtista"></p></div>
+    <div class="tc-acoes">
+      <button class="ico" id="tcVotar" aria-label="Votar no gênero" hidden><i data-lucide="tag"></i></button>
+      <button class="ico" id="tcFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
+    </div>
+  </div>
+  <input type="range" id="tcProgresso" min="0" max="1000" value="0" aria-label="Posição da música">
+  <div class="tc-tempos"><span id="tcAtual">0:00</span><span id="tcTotal">0:00</span></div>
+  <div class="tc-botoes">
+    <button class="ico" id="tcAleatorio" aria-label="Aleatório"><i data-lucide="shuffle"></i></button>
+    <button class="ico grande" id="tcAnterior" aria-label="Anterior"><i data-lucide="skip-back"></i></button>
+    <button class="ico play enorme" id="tcPlay" aria-label="Tocar"><i data-lucide="play"></i></button>
+    <button class="ico grande" id="tcProxima" aria-label="Próxima"><i data-lucide="skip-forward"></i></button>
+    <button class="ico" id="tcRepetir" aria-label="Repetir"><i data-lucide="repeat"></i></button>
+  </div>
+</div>
+
+<div class="voto" id="voto" hidden>
+  <div class="voto-caixa" role="dialog" aria-modal="true" aria-labelledby="votoTitulo">
+    <div class="voto-topo">
+      <h3 id="votoTitulo"></h3>
+      <button class="ico" id="votoFechar" aria-label="Fechar"><i data-lucide="x"></i></button>
+    </div>
+    <p id="votoInfo"></p>
+    <div class="voto-opcoes" id="votoOpcoes"></div>
+    <button class="btn btn-borda" id="votoTirar" hidden><i data-lucide="undo-2"></i>Tirar meu voto</button>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+<audio id="audio" preload="metadata"></audio>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

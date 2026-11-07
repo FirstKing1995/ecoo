@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Trono Admin</title>
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  body { overflow: auto; }
+  .adm { max-width: 900px; margin: 0 auto; padding: 32px 16px 60px; }
+  .adm h1 { margin: 0 0 4px; font-size: 30px; }
+  .adm > p { color: var(--texto-2); margin: 0 0 24px; }
+  .entrar { display: flex; gap: 10px; flex-wrap: wrap; }
+  .entrar input, select {
+    height: 44px; border-radius: 10px; border: 1px solid var(--linha); background: var(--painel);
+    color: var(--texto); font: inherit; padding: 0 14px;
+  }
+  .entrar input { flex: 1; min-width: 200px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--linha); vertical-align: middle; }
+  th { color: var(--texto-2); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  td small { color: var(--texto-2); display: block; }
+  .votos-lista { color: var(--texto-2); font-size: 13px; }
+  .resumo { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .resumo div { background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; padding: 14px 18px; }
+  .resumo strong { font-size: 26px; display: block; }
+  .resumo span { color: var(--texto-2); font-size: 13px; }
+  .msg { margin-top: 12px; color: var(--ouro); min-height: 20px; }
+  @media (max-width: 640px) { thead { display: none; } tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--linha); } td { display: block; border: 0; padding: 4px 0; } }
+</style>
+</head>
+<body>
+<div class="adm">
+  <a class="marca" href="./"><span class="marca-ico"><i data-lucide="crown"></i></span>Trono</a>
+  <h1>Administração</h1>
+  <p>Veja os votos de gênero e trave o gênero de uma música quando quiser decidir sozinho.</p>
+  <form class="entrar" id="entrar">
+    <input type="password" id="senha" placeholder="Senha do admin" autocomplete="current-password" required>
+    <button class="btn btn-ouro" type="submit"><i data-lucide="log-in"></i>Entrar</button>
+  </form>
+  <div class="msg" id="msg"></div>
+  <div id="painel" hidden>
+    <div class="resumo" id="resumo"></div>
+    <table><thead><tr><th>Música</th><th>Votos</th><th>Gênero travado</th></tr></thead><tbody id="linhas"></tbody></table>
+  </div>
+</div>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="config.js"></script>
+<script>
+const API = window.TRONO_API, $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let senha = '', musicas = [], est = null;
+lucide.createIcons();
+if (!API) $('#msg').textContent = 'O servidor de votos ainda não foi ligado (config.js sem TRONO_API).';
+
+async function post(corpo) {
+  const r = await fetch(API, { method: 'POST', body: JSON.stringify({ acao: 'fixar', senha, ...corpo }) });
+  return r.json();
+}
+$('#entrar').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!API) return;
+  senha = $('#senha').value; $('#msg').textContent = 'Conferindo...';
+  try {
+    const [d, lista] = await Promise.all([post({}), fetch('dados/musicas.json').then(r => r.json())]);
+    if (!d.ok) { $('#msg').textContent = d.erro || 'Não deu certo.'; return; }
+    musicas = lista; est = d; $('#entrar').hidden = true; $('#msg').textContent = ''; $('#painel').hidden = false; desenhar();
+  } catch { $('#msg').textContent = 'Sem conexão com o servidor.'; }
+});
+function desenhar() {
+  const sem = musicas.filter(m => m.genero === 'Sem gênero');
+  const totalVotos = Object.values(est.votos).reduce((s, v) => s + Object.values(v).reduce((a, b) => a + b, 0), 0);
+  $('#resumo').innerHTML = `<div><strong>${musicas.length}</strong><span>músicas</span></div>
+    <div><strong>${sem.length}</strong><span>sem gênero de origem</span></div>
+    <div><strong>${totalVotos}</strong><span>votos recebidos</span></div>
+    <div><strong>${Object.keys(est.fixos).length}</strong><span>travadas por você</span></div>`;
+  const ops = g => `<option value="">Deixar os votos decidirem</option>` + est.generos.map(x => `<option ${x === g ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  $('#linhas').innerHTML = sem.map(m => {
+    const v = Object.entries(est.votos[m.id] || {}).sort((a, b) => b[1] - a[1]);
+    return `<tr><td><strong>${esc(m.titulo)}</strong><small>${esc(m.artista)}</small></td>
+      <td class="votos-lista">${v.length ? v.map(([g, n]) => `${esc(g)}: ${n}`).join(', ') : 'nenhum voto'}</td>
+      <td><select data-id="${m.id}">${ops(est.fixos[m.id])}</select></td></tr>`;
+  }).join('');
+}
+$('#linhas').addEventListener('change', async e => {
+  const s = e.target.closest('select'); if (!s) return;
+  $('#msg').textContent = 'Salvando...';
+  try {
+    const d = await post({ id: s.dataset.id, genero: s.value });
+    if (!d.ok) { $('#msg').textContent = d.erro; return; }
+    est = d; $('#msg').textContent = 'Salvo.'; desenhar();
+  } catch { $('#msg').textContent = 'Sem conexão com o servidor.'; }
+});
+</script>
+</body>
+</html>

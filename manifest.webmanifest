@@ -1,0 +1,16 @@
+{
+  "name": "Trono",
+  "short_name": "Trono",
+  "description": "As músicas do King, separadas por gênero.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d0b08",
+  "theme_color": "#0d0b08",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
