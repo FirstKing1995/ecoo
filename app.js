@@ -65,10 +65,28 @@ function recalcular() {
   }
   montarMenu();
 }
+// Catalogo = musicas do site + enviadas pelo admin, menos as desativadas no admin
+let BASE = [], catalogo = ler('catalogo', { inativas: [], enviadas: [] });
+function montarCatalogo() {
+  const fora = new Set(catalogo.inativas || []);
+  const enviadas = (catalogo.enviadas || []).filter(m => m && /^[a-z0-9-]+$/.test(m.id) && /^https:\/\//.test(m.audio))
+    .map(m => ({ ...m, generoOriginal: GENEROS[m.genero] ? m.genero : SEM }));
+  MUSICAS = [...BASE, ...enviadas].filter(m => !fora.has(m.id))
+    .sort((a, b) => ORDEM.indexOf(a.generoOriginal) - ORDEM.indexOf(b.generoOriginal));
+  porId = {}; MUSICAS.forEach(m => porId[m.id] = m);
+  // tira da fila o que foi desativado, sem parar a musica que esta tocando
+  const atual = estado.fila[estado.pos];
+  estado.fila = estado.fila.filter(id => porId[id] || id === atual);
+  estado.pos = Math.max(0, estado.fila.indexOf(atual));
+  if (estado.ordemOriginal) estado.ordemOriginal = estado.ordemOriginal.filter(id => porId[id] || id === atual);
+  recalcular();
+}
 function aplicarEstado(d) {
   if (!d || !d.ok) return false;
   votos.todos = d.votos || {}; votos.fixos = d.fixos || {};
-  recalcular(); return true;
+  catalogo = { inativas: d.inativas || [], enviadas: d.enviadas || [] };
+  guardar('catalogo', catalogo);
+  montarCatalogo(); return true;
 }
 async function buscarVotos() {
   if (!API) return;
@@ -456,9 +474,8 @@ function montarMenu() {
 
 // ---------- Inicio ----------
 fetch('dados/musicas.json').then(r => r.json()).then(lista => {
-  MUSICAS = lista.sort((a, b) => ORDEM.indexOf(a.genero) - ORDEM.indexOf(b.genero));
-  MUSICAS.forEach(m => { porId[m.id] = m; m.generoOriginal = m.genero; });
-  recalcular();
+  BASE = lista.map(m => ({ ...m, generoOriginal: m.genero }));
+  montarCatalogo();
   atualizarModos();
   window.addEventListener('hashchange', rota);
   rota();

@@ -1,5 +1,5 @@
 // Guarda so a casca do app; as musicas vem sempre da rede.
-const CACHE = 'trono-v1';
+const CACHE = 'trono-v2';
 const CASCA = ['./', 'index.html', 'estilo.css', 'app.js', 'config.js','icone.svg', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CASCA))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
