@@ -108,7 +108,7 @@ async function votar(id, genero) {
   aviso(!genero ? 'Voto retirado' : m.genero !== generoAntes && m.genero !== SEM ? `${m.titulo} agora está em ${m.genero}` : `Voto em ${genero} registrado`);
   if (API) {
     try {
-      const r = await fetch(API, { method: 'POST', body: JSON.stringify({ acao: 'votar', id, genero: genero || '', ouvinte }) });
+      const r = await fetch(API, { method: 'POST', body: JSON.stringify({ acao: 'votar', id, genero: genero || '', ouvinte: quemVota() }) });
       if (aplicarEstado(await r.json())) { desenharVoto(id); rota(true); atualizarGeneroPlayer(); }
     } catch { aviso('Sem conexão: o voto ficou salvo só aqui.'); }
   }
@@ -170,8 +170,199 @@ function faixasHTML(lista, mostrarGenero = false) {
     </div>`;
   }).join('') + `</div>`;
 }
-function cardMusica(m) {
-  return `<button class="card-musica" data-tocar-solo="${m.id}">${capaHTML(m)}<strong>${esc(m.titulo)}</strong><small>${esc(m.artista)}</small></button>`;
+function cardMusica(m, ctx) {
+  return `<button class="card-musica" data-tocar-solo="${m.id}"${ctx ? ` data-ctx="${ctx}"` : ''}>${capaHTML(m)}<strong>${esc(m.titulo)}</strong><small>${esc(m.artista)}</small></button>`;
+}
+
+// ---------- Conta do ouvinte ----------
+// Entrar com Google ou com codigo de 6 digitos por e-mail. Favoritas e musicas
+// ouvidas ficam na conta; sem conta, ficam so neste aparelho.
+const GOOGLE_ID = window.ECOO_GOOGLE_CLIENT_ID || '';
+let conta = ler('conta', null); // { token, usuario }
+estado.plays = ler('plays', {});          // total de vezes que cada musica foi ouvida
+let playsPend = ler('playsPend', {});     // ainda nao enviadas para a conta
+let emailCodigo = '';
+
+const quemVota = () => (conta && conta.usuario && /^[a-z0-9]{10,40}$/.test(conta.usuario.id) ? conta.usuario.id : ouvinte);
+async function api(corpo, extra) {
+  const r = await fetch(API, { method: 'POST', body: JSON.stringify(corpo), ...(extra || {}) });
+  return r.json();
+}
+function contar(id) {
+  estado.plays[id] = (estado.plays[id] || 0) + 1; guardar('plays', estado.plays);
+  playsPend[id] = (playsPend[id] || 0) + 1; guardar('playsPend', playsPend);
+  sincronizar();
+}
+let sincT = 0;
+function sincronizar(agora) {
+  if (!conta || !API) return;
+  clearTimeout(sincT);
+  sincT = setTimeout(enviarPerfil, agora ? 0 : 4000);
+}
+async function enviarPerfil(keepalive) {
+  if (!conta || !API) return;
+  const enviando = playsPend; playsPend = {}; guardar('playsPend', playsPend);
+  try {
+    const d = await api({ acao: 'salvarPerfil', token: conta.token, favs: [...estado.favs], plays: enviando }, keepalive ? { keepalive: true } : null);
+    if (d.ok) { estado.plays = { ...d.perfil.plays }; for (const [k, n] of Object.entries(playsPend)) estado.plays[k] = (estado.plays[k] || 0) + n; guardar('plays', estado.plays); }
+    else if (d.sessao === false) { sairLocal('Sua sessão venceu. Entre de novo.'); }
+    else throw 0;
+  } catch {
+    // devolve o que nao foi enviado para tentar de novo depois
+    for (const [k, n] of Object.entries(enviando)) playsPend[k] = (playsPend[k] || 0) + n;
+    guardar('playsPend', playsPend);
+  }
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && conta && Object.keys(playsPend).length) enviarPerfil(true); });
+
+function aplicarLogin(d) {
+  conta = { token: d.token, usuario: d.usuario }; guardar('conta', conta);
+  // junta o que estava no aparelho com o que estava na conta
+  const p = d.perfil || { favs: [], plays: {} };
+  p.favs.forEach(id => estado.favs.add(id)); guardar('favs', [...estado.favs]);
+  estado.plays = { ...p.plays };
+  for (const [k, n] of Object.entries(playsPend)) estado.plays[k] = (estado.plays[k] || 0) + n;
+  guardar('plays', estado.plays);
+  sincronizar(true);
+  atualizarContaUI();
+  aviso('Bem-vindo, ' + (d.usuario.nome || 'ouvinte') + '!');
+  if (location.hash.startsWith('#/voce')) render('voce'); else rota(true);
+}
+function sairLocal(msg) {
+  conta = null; guardar('conta', null);
+  atualizarContaUI();
+  if (msg) aviso(msg);
+  if (location.hash.startsWith('#/voce')) render('voce');
+}
+async function sair() {
+  if (conta) { await enviarPerfil(); api({ acao: 'sair', token: conta.token }).catch(() => {}); }
+  sairLocal('Você saiu da conta. Suas favoritas continuam neste aparelho.');
+}
+async function conferirConta() {
+  if (!conta || !API) return;
+  try {
+    const d = await api({ acao: 'perfil', token: conta.token });
+    if (d.ok) { conta.usuario = d.usuario; guardar('conta', conta); d.perfil.favs.forEach(id => estado.favs.add(id)); guardar('favs', [...estado.favs]); atualizarContaUI(); }
+    else if (d.sessao === false) sairLocal('Sua sessão venceu. Entre de novo.');
+  } catch {}
+}
+function atualizarContaUI() {
+  const u = conta && conta.usuario;
+  document.querySelectorAll('[data-conta-nome]').forEach(el => { el.textContent = u ? (u.nome || 'Você').split(' ')[0] : 'Entrar'; });
+}
+
+function telaEntrar() {
+  listaVisivel = [];
+  setTimeout(montarLogin, 0);
+  return `<section class="entrar-caixa">
+    <span class="entrar-logo">Ec<img class="marca-oo" src="logo-oo.svg" alt="oo"></span>
+    <h1>Entre no Ecoo</h1>
+    <p>Suas favoritas em qualquer aparelho e uma seleção feita a partir do que você mais ouve. Sem senha para lembrar.</p>
+    <div id="gbtn" class="gbtn"></div>
+    ${GOOGLE_ID ? '<div class="ou"><span>ou</span></div>' : ''}
+    <form id="formEmail" class="form-entrar">
+      <label for="emailEntrar">Receba um código no seu e-mail</label>
+      <input id="emailEntrar" type="email" autocomplete="email" inputmode="email" placeholder="seu@email.com" required value="${esc(emailCodigo)}">
+      <button class="btn btn-ouro" type="submit"><i data-lucide="mail"></i>Enviar código</button>
+    </form>
+    <form id="formCodigo" class="form-entrar" hidden>
+      <label for="codigoEntrar">Digite o código de 6 números que chegou em <b id="emailMostrado"></b></label>
+      <input id="codigoEntrar" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
+      <button class="btn btn-ouro" type="submit"><i data-lucide="log-in"></i>Entrar</button>
+      <button class="link" type="button" id="trocarEmail">Usar outro e-mail</button>
+    </form>
+    <p class="msg-entrar" id="msgEntrar" role="status" aria-live="polite"></p>
+    <small class="nota">Sem conta, o Ecoo continua funcionando. Suas favoritas ficam só neste aparelho.</small>
+  </section>`;
+}
+function msgEntrar(t, erro) { const m = $('#msgEntrar'); if (m) { m.textContent = t || ''; m.classList.toggle('erro', !!erro); } }
+function montarLogin() {
+  const fe = $('#formEmail'), fc = $('#formCodigo');
+  if (!fe) return;
+  if (!API) { msgEntrar('O servidor ainda não está ligado.', true); return; }
+  fe.addEventListener('submit', async e => {
+    e.preventDefault();
+    emailCodigo = $('#emailEntrar').value.trim();
+    const b = fe.querySelector('button'); b.disabled = true; msgEntrar('Enviando...');
+    try {
+      const d = await api({ acao: 'pedirCodigo', email: emailCodigo });
+      if (!d.ok) return msgEntrar(d.erro, true);
+      fe.hidden = true; fc.hidden = false; $('#emailMostrado').textContent = emailCodigo; $('#codigoEntrar').focus();
+      msgEntrar('Código enviado. Olhe também a caixa de spam.');
+    } catch { msgEntrar('Sem conexão. Tente de novo.', true); } finally { b.disabled = false; }
+  });
+  fc.addEventListener('submit', async e => {
+    e.preventDefault();
+    const b = fc.querySelector('button[type=submit]'); b.disabled = true; msgEntrar('Conferindo...');
+    try {
+      const d = await api({ acao: 'entrarCodigo', email: emailCodigo, codigo: $('#codigoEntrar').value });
+      if (!d.ok) return msgEntrar(d.erro, true);
+      aplicarLogin(d);
+    } catch { msgEntrar('Sem conexão. Tente de novo.', true); } finally { b.disabled = false; }
+  });
+  $('#trocarEmail').addEventListener('click', () => { fc.hidden = true; fe.hidden = false; msgEntrar(''); $('#emailEntrar').focus(); });
+  if (GOOGLE_ID) carregarGoogle().then(() => {
+    const alvo = $('#gbtn'); if (!alvo || !window.google) return;
+    google.accounts.id.initialize({ client_id: GOOGLE_ID, callback: entrarGoogle, ux_mode: 'popup', use_fedcm_for_prompt: true });
+    google.accounts.id.renderButton(alvo, { theme: 'filled_black', size: 'large', shape: 'pill', text: 'continue_with', locale: 'pt-BR', width: Math.min(320, alvo.clientWidth || 320) });
+  }).catch(() => { const a = $('#gbtn'); if (a) a.innerHTML = '<small class="nota">Não consegui carregar o botão do Google. Use o código por e-mail.</small>'; });
+}
+let googleCarregando = null;
+function carregarGoogle() {
+  if (window.google && google.accounts) return Promise.resolve();
+  return googleCarregando ||= new Promise((ok, falha) => {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = ok; s.onerror = falha;
+    document.head.appendChild(s);
+  });
+}
+async function entrarGoogle(resp) {
+  msgEntrar('Entrando...');
+  try {
+    const d = await api({ acao: 'loginGoogle', credential: resp.credential });
+    if (!d.ok) return msgEntrar(d.erro, true);
+    aplicarLogin(d);
+  } catch { msgEntrar('Sem conexão. Tente de novo.', true); }
+}
+
+// ---------- Feito para voce ----------
+function aleatorioDoDia(id) { // mesmo sorteio o dia inteiro, para a lista nao mudar a cada toque
+  let h = 2166136261; const s = id + new Date().toDateString() + quemVota();
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0) / 4294967296;
+}
+function generosPreferidos() {
+  const peso = {};
+  for (const m of MUSICAS) {
+    const p = (estado.plays[m.id] || 0) + (estado.favs.has(m.id) ? 3 : 0);
+    if (p && m.genero !== SEM) peso[m.genero] = (peso[m.genero] || 0) + p;
+  }
+  return Object.entries(peso).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+}
+function maisOuvidas(n) {
+  return MUSICAS.filter(m => estado.plays[m.id]).sort((a, b) => estado.plays[b.id] - estado.plays[a.id]).slice(0, n);
+}
+function feitoParaVoce() {
+  const gens = generosPreferidos().slice(0, 3);
+  if (!gens.length) return [];
+  const pesoG = Object.fromEntries(gens.map((g, i) => [g, 3 - i]));
+  return MUSICAS.filter(m => pesoG[m.genero] || estado.favs.has(m.id))
+    .map(m => ({ m, s: ((pesoG[m.genero] || 1) + (estado.favs.has(m.id) ? 1.5 : 0)) * (0.5 + aleatorioDoDia(m.id)) / (1 + (estado.plays[m.id] || 0) * 0.25) }))
+    .sort((a, b) => b.s - a.s).slice(0, 20).map(x => x.m);
+}
+function secoesParaVoce() {
+  const mix = feitoParaVoce(), top = maisOuvidas(10);
+  if (!mix.length) return `<a class="chamada-voto" href="${conta ? '#/genero/' + encodeURIComponent(ORDEM[0]) : '#/voce'}">
+      <span class="chamada-ico"><i data-lucide="sparkles"></i></span>
+      <span><strong>Feito para você</strong><small>${conta ? 'Ouça algumas músicas e o Ecoo monta uma seleção com o que você mais curte.' : 'Entre com Google ou e-mail e o Ecoo monta uma seleção com o que você mais curte, em qualquer aparelho.'}</small></span>
+      <i data-lucide="chevron-right"></i></a>`;
+  const gens = generosPreferidos().slice(0, 3).join(', ');
+  return `<section class="secao">
+      <div class="secao-cab"><div><h2>Feito para você</h2><small>Mais ${esc(gens)}, renovado todo dia</small></div>
+        <button class="btn btn-ouro" data-acao="mix"><i data-lucide="play"></i>Tocar</button></div>
+      <div class="fileira">${mix.map(m => cardMusica(m, 'mix')).join('')}</div></section>
+    ${top.length >= 3 ? `<section class="secao"><h2>Suas mais ouvidas</h2><div class="fileira">${top.map(m => cardMusica(m, 'top')).join('')}</div></section>` : ''}
+    ${!conta ? `<p class="nota-conta"><a class="link" href="#/voce">Entre</a> para não perder essa seleção e suas favoritas se trocar de aparelho.</p>` : ''}`;
 }
 
 let listaVisivel = [];
@@ -198,6 +389,7 @@ const telas = {
         <span class="chamada-ico"><i data-lucide="tags"></i></span>
         <span><strong>${semN} música${semN > 1 ? 's' : ''} sem gênero</strong><small>Ouça e diga em que gênero cada uma se encaixa. Você decide junto com a galera.</small></span>
         <i data-lucide="chevron-right"></i></a>` : ''}
+      ${secoesParaVoce()}
       ${rec.length ? `<section class="secao"><h2>Ouvidas há pouco</h2><div class="fileira">${rec.map(cardMusica).join('')}</div></section>` : ''}
       <section class="secao"><h2>Gêneros</h2><div class="grade-generos">
         ${gens.map(g => `<a class="card-genero" href="#/genero/${encodeURIComponent(g)}" style="--cor:${GENEROS[g].cor}">
@@ -232,9 +424,29 @@ const telas = {
   },
   favoritas() {
     listaVisivel = MUSICAS.filter(m => estado.favs.has(m.id));
-    return `<div class="topo-pagina"><h1>Favoritas</h1><p>Fica salvo neste aparelho.</p></div>
+    return `<div class="topo-pagina"><h1>Favoritas</h1><p>${conta ? 'Salvas na sua conta, em qualquer aparelho.' : 'Salvas neste aparelho. <a class="link" href="#/voce">Entre</a> para levar para qualquer aparelho.'}</p></div>
       ${listaVisivel.length ? `<div class="barra-acoes"><button class="btn-play-redondo" data-acao="lista" aria-label="Tocar favoritas"><i data-lucide="play"></i></button></div>` : ''}
       ${listaVisivel.length ? faixasHTML(listaVisivel, true) : `<div class="vazio"><i data-lucide="heart"></i><p>Toque no coração de uma música para ela aparecer aqui.</p></div>`}`;
+  },
+  voce() {
+    if (!conta) return telaEntrar();
+    const u = conta.usuario, top = maisOuvidas(10);
+    listaVisivel = top;
+    const total = Object.values(estado.plays).reduce((s, n) => s + n, 0);
+    const gen = generosPreferidos()[0];
+    const foto = u.foto && /^https:\/\//.test(u.foto)
+      ? `<img class="avatar grande" src="${esc(u.foto)}" alt="" referrerpolicy="no-referrer">`
+      : `<span class="avatar grande">${esc((u.nome || '?').charAt(0).toUpperCase())}</span>`;
+    return `<header class="perfil-topo">${foto}<div><small>Sua conta</small><h1>${esc(u.nome || 'Ouvinte')}</h1><p>${esc(u.email)}</p></div></header>
+      <div class="resumo-voce">
+        <div><strong>${total}</strong><span>músicas ouvidas</span></div>
+        <div><strong>${estado.favs.size}</strong><span>favoritas</span></div>
+        <div><strong>${gen ? esc(gen) : '—'}</strong><span>gênero que você mais ouve</span></div>
+      </div>
+      <section class="secao"><h2>Suas mais ouvidas</h2>
+        ${top.length ? faixasHTML(top, true) : '<div class="vazio"><i data-lucide="headphones"></i><p>Ouça algumas músicas e elas aparecem aqui.</p></div>'}
+      </section>
+      <div class="barra-acoes"><button class="btn btn-borda" data-acao="sair"><i data-lucide="log-out"></i>Sair da conta</button></div>`;
   },
   naoAchou() { listaVisivel = []; return `<div class="vazio"><i data-lucide="search-x"></i><p>Essa página não existe.</p><a class="btn btn-borda" href="#/">Voltar ao início</a></div>`; },
 };
@@ -261,7 +473,7 @@ function rotaBase() {
     return;
   }
   if (tipo === 'genero') return render('genero', arg);
-  if (tipo === 'buscar' || tipo === 'favoritas') return render(tipo);
+  if (tipo === 'buscar' || tipo === 'favoritas' || tipo === 'voce') return render(tipo);
   if (!tipo) return render('inicio');
   render('naoAchou');
 }
@@ -389,6 +601,7 @@ function favoritar(id) {
   if (!id) return;
   estado.favs.has(id) ? estado.favs.delete(id) : estado.favs.add(id);
   guardar('favs', [...estado.favs]);
+  sincronizar();
   aviso(estado.favs.has(id) ? 'Salva nas favoritas' : 'Removida das favoritas');
   document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => b.classList.toggle('on', estado.favs.has(id)));
   atualizarFav();
@@ -492,11 +705,19 @@ $('#conteudo').addEventListener('click', e => {
     return carregarFila(listaVisivel.map(m => m.id), +faixa.dataset.lista);
   }
   const solo = e.target.closest('[data-tocar-solo]');
-  if (solo) { const m = porId[solo.dataset.tocarSolo]; const ids = MUSICAS.filter(x => x.genero === m.genero).map(x => x.id); return carregarFila(ids, ids.indexOf(m.id)); }
+  if (solo) {
+    const m = porId[solo.dataset.tocarSolo]; if (!m) return;
+    // card de "Feito para voce" ou "Mais ouvidas" toca aquela lista; os outros, o genero
+    const ctx = solo.dataset.ctx;
+    const ids = (ctx === 'mix' ? feitoParaVoce() : ctx === 'top' ? maisOuvidas(10) : MUSICAS.filter(x => x.genero === m.genero)).map(x => x.id);
+    return carregarFila(ids, Math.max(0, ids.indexOf(m.id)));
+  }
   const ac = e.target.closest('[data-acao]');
   if (!ac) return;
   const todos = MUSICAS.map(m => m.id);
   if (ac.dataset.acao === 'tudo') carregarFila(todos);
+  if (ac.dataset.acao === 'mix') carregarFila(feitoParaVoce().map(m => m.id));
+  if (ac.dataset.acao === 'sair') sair();
   if (ac.dataset.acao === 'misturar') { estado.aleatorio = true; guardar('aleatorio', true); atualizarModos(); carregarFila(todos, Math.floor(Math.random() * todos.length)); }
   if (ac.dataset.acao === 'lista') carregarFila(listaVisivel.map(m => m.id));
   if (ac.dataset.acao === 'lista-mix') { estado.aleatorio = true; guardar('aleatorio', true); atualizarModos(); const ids = listaVisivel.map(m => m.id); carregarFila(ids, Math.floor(Math.random() * ids.length)); }
@@ -542,7 +763,14 @@ audio.addEventListener('pause', () => {
 audio.addEventListener('play', () => { pausaPedida = false; paradaNoFundo = false; $('#dica').hidden = true; });
 // batida a cada 10 s: se o sistema fechar o app com a tela apagada, na volta ele sabe
 let batidaEm = 0;
-audio.addEventListener('timeupdate', () => { if (Date.now() - batidaEm > 10000) marcarSessao(true); });
+audio.addEventListener('timeupdate', () => {
+  if (Date.now() - batidaEm > 10000) marcarSessao(true);
+  // conta como "ouvida" depois de 30 s (ou metade, em musica curta)
+  const id = estado.fila[estado.pos];
+  if (id && contadaId !== id && audio.currentTime >= Math.min(30, (audio.duration || 60) / 2)) { contadaId = id; contar(id); }
+});
+let contadaId = null;
+audio.addEventListener('emptied', () => { contadaId = null; });
 function marcarSessao(tocando) {
   batidaEm = Date.now();
   const id = estado.fila[estado.pos];
@@ -622,6 +850,8 @@ fetch('dados/musicas.json').then(r => r.json()).then(lista => {
   window.addEventListener('hashchange', rota);
   rota();
   buscarVotos();
+  atualizarContaUI();
+  conferirConta();
   // o sistema fechou o app enquanto tocava com a tela apagada: oferece continuar
   const s = ler('sessao', null);
   if (s && s.oculto && Date.now() - s.em < 3 * 3600 * 1000 && porId[s.id]) mostrarDica(true);
