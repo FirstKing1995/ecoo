@@ -303,11 +303,41 @@ function carregarFila(ids, inicio = 0, tocar = true) {
   estado.fila = fila; estado.pos = pos; estado.ordemOriginal = ids.slice();
   abrir(tocar);
 }
+// ---------- Pre-carregamento ----------
+// Com a tela apagada o celular corta ou atrasa a rede; por isso a proxima faixa
+// e baixada inteira enquanto a atual toca, e a troca acontece sem precisar da rede.
+const prontas = new Map(); // id -> blob URL
+let baixando = null;
+function idProxima() {
+  if (!estado.fila.length) return null;
+  if (estado.repetir === 'uma') return null;
+  if (estado.pos < estado.fila.length - 1) return estado.fila[estado.pos + 1];
+  return estado.repetir === 'todas' ? estado.fila[0] : null;
+}
+function mesmaOrigem(url) { try { return new URL(url, location.href).origin === location.origin; } catch { return false; } }
+async function preCarregar() {
+  const id = idProxima(), m = id && porId[id];
+  if (!m || prontas.has(id) || baixando === id || !mesmaOrigem(m.audio)) return;
+  baixando = id;
+  try {
+    const r = await fetch(m.audio);
+    if (!r.ok) throw new Error(r.status);
+    const url = URL.createObjectURL(await r.blob());
+    prontas.set(id, url);
+  } catch {} finally { if (baixando === id) baixando = null; }
+  limparProntas();
+}
+function limparProntas() {
+  const manter = new Set([estado.fila[estado.pos], idProxima()]);
+  for (const [id, url] of prontas) if (!manter.has(id)) { URL.revokeObjectURL(url); prontas.delete(id); }
+}
+
 function abrir(tocar = true) {
   const m = porId[estado.fila[estado.pos]];
   if (!m) return;
-  audio.src = m.audio;
+  audio.src = prontas.get(m.id) || m.audio;
   if (tocar) audio.play().catch(() => {});
+  limparProntas();
   $('#player').hidden = false;
   $('#pTitulo').textContent = m.titulo; $('#pArtista').textContent = m.artista;
   $('#tcTitulo').textContent = m.titulo; $('#tcArtista').textContent = m.artista; $('#tcGenero').textContent = m.genero;
@@ -374,12 +404,37 @@ audio.addEventListener('timeupdate', () => {
   if (!arrastando) ['#progresso', '#tcProgresso'].forEach(s => { $(s).value = v; pintarRange($(s)); });
   $('#tAtual').textContent = $('#tcAtual').textContent = tempo(audio.currentTime);
   $('#miniBarra').style.width = (v / 10) + '%';
+  // comeca a baixar a proxima alguns segundos depois do inicio
+  if (audio.currentTime > 4 && !audio.paused) preCarregar();
+  // posicao na tela de bloqueio (a cada ~5 s basta)
+  if ('mediaSession' in navigator && navigator.mediaSession.setPositionState && audio.duration && Date.now() - (posicaoEm || 0) > 5000) {
+    posicaoEm = Date.now();
+    try { navigator.mediaSession.setPositionState({ duration: audio.duration, position: Math.min(audio.currentTime, audio.duration), playbackRate: audio.playbackRate || 1 }); } catch {}
+  }
 });
-audio.addEventListener('loadedmetadata', () => { $('#tTotal').textContent = $('#tcTotal').textContent = tempo(audio.duration); });
-audio.addEventListener('play', atualizarPlay);
-audio.addEventListener('pause', atualizarPlay);
+let posicaoEm = 0;
+audio.addEventListener('loadedmetadata', () => { $('#tTotal').textContent = $('#tcTotal').textContent = tempo(audio.duration); posicaoEm = 0; });
+audio.addEventListener('play', () => { atualizarPlay(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing'; });
+audio.addEventListener('pause', () => { atualizarPlay(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused'; });
 audio.addEventListener('ended', () => proxima(false));
-audio.addEventListener('error', () => { if (audio.src) { aviso('Não consegui carregar essa música. Pulando.'); setTimeout(() => proxima(false), 800); } });
+audio.addEventListener('error', () => {
+  if (!audio.src) return;
+  const m = porId[estado.fila[estado.pos]];
+  // o arquivo pre-carregado falhou: tenta direto pela rede antes de pular
+  if (m && audio.src.startsWith('blob:')) { prontas.delete(m.id); audio.src = m.audio; audio.play().catch(() => {}); return; }
+  aviso('Não consegui carregar essa música. Pulando.'); setTimeout(() => proxima(false), 800);
+});
+// rede travou no meio da musica (comum com a tela apagada): recarrega do ponto em que parou
+let travadaDesde = 0;
+['stalled', 'waiting'].forEach(ev => audio.addEventListener(ev, () => {
+  if (audio.src.startsWith('blob:') || audio.paused) return;
+  const ponto = audio.currentTime, quando = travadaDesde = Date.now();
+  setTimeout(() => {
+    if (travadaDesde !== quando || audio.paused || audio.currentTime > ponto + 0.5) return;
+    audio.load(); audio.currentTime = ponto; audio.play().catch(() => {});
+  }, 8000);
+}));
+audio.addEventListener('playing', () => { travadaDesde = 0; });
 
 let arrastando = false;
 ['#progresso', '#tcProgresso'].forEach(s => {
@@ -463,6 +518,10 @@ if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('pause', () => audio.pause());
   navigator.mediaSession.setActionHandler('nexttrack', () => proxima());
   navigator.mediaSession.setActionHandler('previoustrack', anterior);
+  const acao = (nome, fn) => { try { navigator.mediaSession.setActionHandler(nome, fn); } catch {} };
+  acao('seekto', d => { if (d.seekTime != null) audio.currentTime = d.seekTime; });
+  acao('seekbackward', d => { audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10)); });
+  acao('seekforward', d => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + (d.seekOffset || 10)); });
 }
 
 function montarMenu() {

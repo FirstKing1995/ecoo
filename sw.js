@@ -1,5 +1,5 @@
 // Guarda so a casca do app; as musicas vem sempre da rede.
-const CACHE = 'ecoo-v3';
+const CACHE = 'ecoo-v4';
 const CASCA = ['./', 'index.html', 'estilo.css', 'app.js', 'config.js','icone.svg', 'logo-oo.svg', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CASCA))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
