@@ -191,6 +191,7 @@ const telas = {
         <div class="acoes">
           <button class="btn btn-ouro" data-acao="tudo"><i data-lucide="play"></i>Tocar tudo</button>
           <button class="btn btn-borda" data-acao="misturar"><i data-lucide="shuffle"></i>Misturar</button>
+          <button class="btn btn-borda so-instalar" data-instalar><i data-lucide="download"></i>Instalar app</button>
         </div>
       </section>
       ${semN ? `<a class="chamada-voto" href="#/genero/${encodeURIComponent(SEM)}">
@@ -358,14 +359,18 @@ function proxima(manual = true) {
   if (!manual && estado.repetir === 'uma') { audio.currentTime = 0; audio.play(); return; }
   if (estado.pos < estado.fila.length - 1) estado.pos++;
   else if (estado.repetir === 'todas' || manual) estado.pos = 0;
-  else { audio.pause(); return; }
+  else { pausar(); return; }
   abrir(true);
 }
+// Pausa pedida pela pessoa (botao, fone, fim da fila). Qualquer outra pausa com o app
+// em segundo plano foi o sistema do celular, e o app avisa como evitar.
+let pausaPedida = false;
+function pausar() { pausaPedida = true; audio.pause(); }
 function anterior() {
   if (audio.currentTime > 3) { audio.currentTime = 0; return; }
   if (estado.pos > 0) { estado.pos--; abrir(true); } else audio.currentTime = 0;
 }
-function alternar() { if (!audio.src) return carregarFila(MUSICAS.map(m => m.id)); audio.paused ? audio.play() : audio.pause(); }
+function alternar() { if (!audio.src) return carregarFila(MUSICAS.map(m => m.id)); audio.paused ? audio.play() : pausar(); }
 function setIcone(btn, nome) { btn.innerHTML = `<i data-lucide="${nome}"></i>`; }
 function atualizarPlay() {
   ['#bPlay', '#tcPlay', '#bPlayMini'].forEach(s => setIcone($(s), audio.paused ? 'play' : 'pause'));
@@ -515,7 +520,7 @@ $('#voto').addEventListener('click', e => {
 ['#bGenero', '#tcVotar'].forEach(s => $(s).addEventListener('click', () => abrirVoto(estado.fila[estado.pos])));
 if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('play', () => audio.play());
-  navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+  navigator.mediaSession.setActionHandler('pause', pausar);
   navigator.mediaSession.setActionHandler('nexttrack', () => proxima());
   navigator.mediaSession.setActionHandler('previoustrack', anterior);
   const acao = (nome, fn) => { try { navigator.mediaSession.setActionHandler(nome, fn); } catch {} };
@@ -523,6 +528,84 @@ if ('mediaSession' in navigator) {
   acao('seekbackward', d => { audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10)); });
   acao('seekforward', d => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + (d.seekOffset || 10)); });
 }
+
+// ---------- Tela apagada: Android x iPhone ----------
+const ehIOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const ehAndroid = /Android/i.test(navigator.userAgent);
+const instalado = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let paradaNoFundo = false;
+
+audio.addEventListener('pause', () => {
+  if (pausaPedida) { marcarSessao(false); pausaPedida = false; return; }
+  if (!audio.ended && document.hidden) paradaNoFundo = true;
+});
+audio.addEventListener('play', () => { pausaPedida = false; paradaNoFundo = false; $('#dica').hidden = true; });
+// batida a cada 10 s: se o sistema fechar o app com a tela apagada, na volta ele sabe
+let batidaEm = 0;
+audio.addEventListener('timeupdate', () => { if (Date.now() - batidaEm > 10000) marcarSessao(true); });
+function marcarSessao(tocando) {
+  batidaEm = Date.now();
+  const id = estado.fila[estado.pos];
+  guardar('sessao', tocando && id ? { id, t: Math.floor(audio.currentTime), em: Date.now(), oculto: document.hidden, fila: estado.fila.slice(0, 200), pos: estado.pos } : null);
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { if (!audio.paused) marcarSessao(true); return; }
+  if (paradaNoFundo && audio.paused) mostrarDica(false);
+  paradaNoFundo = false;
+});
+function textoDica() {
+  if (ehIOS && instalado) return {
+    titulo: 'O iPhone pausou o Ecoo quando a tela apagou',
+    texto: 'No iPhone, o app instalado na tela de início para de tocar com a tela bloqueada. Abra o Ecoo pelo Safari: lá ele continua tocando com a tela apagada e aparece no controle da tela de bloqueio.',
+    extra: 'Copiar link para abrir no Safari',
+  };
+  if (ehIOS) return {
+    titulo: 'O iPhone pausou o Ecoo',
+    texto: 'Para tocar com a tela bloqueada, deixe o Ecoo aberto no Safari, não feche a aba, e use os controles da tela de bloqueio. O Modo de Pouca Energia também pode pausar a música.',
+  };
+  if (ehAndroid) return {
+    titulo: 'O celular pausou o Ecoo para economizar bateria',
+    texto: `Para não acontecer de novo: Configurações > Apps > ${instalado ? 'Ecoo' : 'Chrome'} > Bateria > Sem restrições. Em alguns celulares o nome é "Não otimizar".`,
+  };
+  return { titulo: 'A música parou enquanto o app estava em segundo plano', texto: 'Toque em continuar para voltar de onde parou.' };
+}
+function mostrarDica(recuperar) {
+  const d = textoDica();
+  $('#dicaTitulo').textContent = d.titulo;
+  $('#dicaTexto').textContent = d.texto;
+  $('#dicaExtra').hidden = !d.extra;
+  if (d.extra) $('#dicaExtra').querySelector('span').textContent = d.extra;
+  $('#dica').dataset.recuperar = recuperar ? '1' : '';
+  $('#dica').hidden = false; icones();
+}
+$('#dica').addEventListener('click', async e => {
+  if (e.target.closest('#dicaContinuar')) {
+    $('#dica').hidden = true;
+    const s = ler('sessao', null);
+    if ($('#dica').dataset.recuperar && s && porId[s.id]) {
+      const fila = (s.fila || [s.id]).filter(id => porId[id]);
+      estado.fila = fila.length ? fila : [s.id]; estado.pos = Math.max(0, estado.fila.indexOf(s.id)); estado.ordemOriginal = estado.fila.slice();
+      abrir(true);
+      audio.addEventListener('loadedmetadata', () => { audio.currentTime = s.t || 0; }, { once: true });
+    } else audio.play().catch(() => {});
+  }
+  if (e.target.closest('#dicaExtra')) {
+    const url = location.href.split('#')[0];
+    try { await navigator.clipboard.writeText(url); aviso('Link copiado. Cole no Safari.'); } catch { aviso(url); }
+  }
+  if (e.target.closest('#dicaFechar')) $('#dica').hidden = true;
+});
+
+// Android/Chrome: botao de instalar o app
+let pedidoInstalar = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; document.body.classList.add('pode-instalar'); });
+window.addEventListener('appinstalled', () => { pedidoInstalar = null; document.body.classList.remove('pode-instalar'); aviso('Ecoo instalado. Ele aparece junto dos seus apps.'); });
+document.addEventListener('click', async e => {
+  if (!e.target.closest('[data-instalar]') || !pedidoInstalar) return;
+  pedidoInstalar.prompt();
+  try { await pedidoInstalar.userChoice; } catch {}
+  pedidoInstalar = null; document.body.classList.remove('pode-instalar');
+});
 
 function montarMenu() {
   const lista = ORDEM.filter(g => MUSICAS.some(m => m.genero === g));
@@ -539,6 +622,9 @@ fetch('dados/musicas.json').then(r => r.json()).then(lista => {
   window.addEventListener('hashchange', rota);
   rota();
   buscarVotos();
+  // o sistema fechou o app enquanto tocava com a tela apagada: oferece continuar
+  const s = ler('sessao', null);
+  if (s && s.oculto && Date.now() - s.em < 3 * 3600 * 1000 && porId[s.id]) mostrarDica(true);
   setInterval(() => { if (!document.hidden) buscarVotos(); }, 90000);
 }).catch(() => { $('#conteudo').innerHTML = '<div class="vazio"><p>Não consegui carregar as músicas. Atualize a página.</p></div>'; });
 

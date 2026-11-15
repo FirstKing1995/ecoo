@@ -168,6 +168,11 @@ svg.lucide { width: 20px; height: 20px; stroke-width: 2; flex: none; }
 .chip.on { background: var(--cor); border-color: var(--ouro); }
 .chip b { background: rgba(0,0,0,.35); border-radius: 999px; padding: 1px 8px; font-size: 12px; }
 .tc-acoes { display: flex; gap: 4px; }
+.dica h3 { margin: 12px 0 0; font-size: 20px; }
+.dica p { line-height: 1.5; }
+.dica-ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: #2c2618; color: var(--ouro); }
+.so-instalar { display: none; }
+.pode-instalar .so-instalar { display: inline-flex; }
 
 /* Busca */
 .campo-busca { position: relative; max-width: 480px; }
