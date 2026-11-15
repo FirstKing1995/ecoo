@@ -1,4 +1,4 @@
-// Trono: player de musicas do King
+// Ecoo: player de musicas do King
 const GENEROS = {
   'Hip-Hop':      { cor: '#8a6414', icone: 'crown',          desc: 'O King em inglês, batida pesada e recado motivador.' },
   'Rap':          { cor: '#7a2e1e', icone: 'mic',            desc: 'Rima em português, papo reto.' },
@@ -270,7 +270,7 @@ function render(tela, arg) {
   c.scrollTop = 0;
   document.querySelectorAll('[data-rota]').forEach(a => a.classList.toggle('ativo', a.dataset.rota === tela));
   document.querySelectorAll('#generosMenu a').forEach(a => a.classList.toggle('ativo', tela === 'genero' && a.dataset.g === arg));
-  document.title = tela === 'genero' ? arg + ' · Trono' : 'Trono';
+  document.title = tela === 'genero' ? arg + ' · Ecoo' : 'Ecoo';
   if (tela === 'buscar') { const i = $('#busca'); i.addEventListener('input', () => buscar(i.value)); i.focus(); }
   icones();
 }
@@ -320,7 +320,7 @@ function abrir(tocar = true) {
   estado.recentes = [m.id, ...estado.recentes.filter(id => id !== m.id)].slice(0, 20); guardar('recentes', estado.recentes);
   if ('mediaSession' in navigator) {
     const art = m.capa ? [{ src: m.capa, sizes: '400x400', type: 'image/jpeg' }] : [{ src: 'icone-512.png', sizes: '512x512', type: 'image/png' }];
-    navigator.mediaSession.metadata = new MediaMetadata({ title: m.titulo, artist: m.artista, album: m.genero + ' · Trono', artwork: art });
+    navigator.mediaSession.metadata = new MediaMetadata({ title: m.titulo, artist: m.artista, album: m.genero + ' · Ecoo', artwork: art });
   }
 }
 function proxima(manual = true) {
@@ -361,7 +361,7 @@ function favoritar(id) {
 }
 async function compartilhar(url, titulo) {
   try {
-    if (navigator.share) { await navigator.share({ title: titulo, text: titulo + ' no Trono', url }); return; }
+    if (navigator.share) { await navigator.share({ title: titulo, text: titulo + ' no Ecoo', url }); return; }
     await navigator.clipboard.writeText(url); aviso('Link copiado. É só colar na conversa.');
   } catch (e) { if (e && e.name !== 'AbortError') aviso('Não deu para copiar. Link: ' + url); }
 }
@@ -440,7 +440,7 @@ $('#conteudo').addEventListener('click', e => {
   if (ac.dataset.acao === 'misturar') { estado.aleatorio = true; guardar('aleatorio', true); atualizarModos(); carregarFila(todos, Math.floor(Math.random() * todos.length)); }
   if (ac.dataset.acao === 'lista') carregarFila(listaVisivel.map(m => m.id));
   if (ac.dataset.acao === 'lista-mix') { estado.aleatorio = true; guardar('aleatorio', true); atualizarModos(); const ids = listaVisivel.map(m => m.id); carregarFila(ids, Math.floor(Math.random() * ids.length)); }
-  if (ac.dataset.acao === 'link-genero') compartilhar(location.href.split('#')[0] + '#/genero/' + encodeURIComponent(ac.dataset.genero), ac.dataset.genero + ' no Trono');
+  if (ac.dataset.acao === 'link-genero') compartilhar(location.href.split('#')[0] + '#/genero/' + encodeURIComponent(ac.dataset.genero), ac.dataset.genero + ' no Ecoo');
 });
 $('#conteudo').addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.faixa')) { e.preventDefault(); e.target.click(); }

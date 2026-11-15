@@ -32,9 +32,9 @@ svg.lucide { width: 20px; height: 20px; stroke-width: 2; flex: none; }
 
 /* Lateral */
 .lateral { grid-area: lateral; background: #000; padding: 20px 12px; overflow-y: auto; border-right: 1px solid var(--linha); }
-.marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 22px; letter-spacing: .5px; padding: 4px 10px 22px; }
-.marca-ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--ouro); color: #1a1205; }
-.marca-ico svg.lucide { width: 20px; height: 20px; }
+.marca { display: flex; align-items: flex-end; font-weight: 800; font-size: 30px; line-height: 1; letter-spacing: -.5px; padding: 4px 10px 22px; color: var(--texto); }
+/* os dois "o" sao as conchas do fone; a base dos circulos senta na linha do texto */
+.marca-oo { height: 1.02em; width: auto; margin-left: .04em; margin-bottom: -.02em; }
 .menu { display: flex; flex-direction: column; gap: 2px; }
 .menu a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 8px; color: var(--texto-2); font-weight: 500; }
 .menu a:hover { color: var(--texto); background: var(--painel); }
