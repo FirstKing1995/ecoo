@@ -5,4 +5,4 @@ window.TRONO_MIN_VOTOS = 2;
 // Client ID do Google (Google Cloud > Credenciais > ID do cliente OAuth, tipo Aplicativo da Web).
 // Vazio = o botao "Continuar com Google" nao aparece e so o codigo por e-mail funciona.
 // O mesmo valor precisa estar em GOOGLE_CLIENT_ID no Contas.gs do servidor.
-window.ECOO_GOOGLE_CLIENT_ID = '';
+window.ECOO_GOOGLE_CLIENT_ID = '802982872602-ol7alo2f4dpba8u1apapfu2lcnk0gdfl.apps.googleusercontent.com';
