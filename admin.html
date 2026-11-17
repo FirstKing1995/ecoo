@@ -255,7 +255,21 @@ $('#lista').addEventListener('click', e => {
   if (b.dataset.ativar) acao({ acao: 'ativar', id: m.id, ativa: !m.ativa }, m.ativa ? `${m.titulo} saiu do ar.` : `${m.titulo} voltou ao ar.`);
   if (b.dataset.ouvir) {
     if (player.dataset.id === m.id && !player.paused) { player.pause(); return msg(''); }
-    player.src = m.audio; player.dataset.id = m.id; player.play().then(() => msg('Tocando ' + m.titulo + '. Clique em Ouvir de novo para parar.')).catch(() => msg('Não consegui tocar essa música.', true));
+    player.dataset.id = m.id;
+    if (m.enviada) {
+      // musicas do Drive vem pelo servidor (o Drive nao deixa tocar direto aqui)
+      msg('Carregando ' + m.titulo + '...');
+      player.play().catch(() => {}); // destrava o audio no toque (iPhone)
+      fetch(API + '?audio=' + encodeURIComponent(m.id)).then(r => r.json()).then(d => {
+        if (!d.ok) throw 0;
+        const bin = atob(d.dados), bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        player.src = URL.createObjectURL(new Blob([bytes], { type: d.mime }));
+        return player.play();
+      }).then(() => msg('Tocando ' + m.titulo + '. Clique em Ouvir de novo para parar.')).catch(() => msg('Não consegui tocar essa música.', true));
+      return;
+    }
+    player.src = m.audio; player.play().then(() => msg('Tocando ' + m.titulo + '. Clique em Ouvir de novo para parar.')).catch(() => msg('Não consegui tocar essa música.', true));
   }
   if (b.dataset.renomear) {
     const titulo = prompt('Nome da música', m.titulo); if (titulo === null) return;

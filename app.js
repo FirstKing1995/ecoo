@@ -528,9 +528,30 @@ function idProxima() {
   return estado.repetir === 'todas' ? estado.fila[0] : null;
 }
 function mesmaOrigem(url) { try { return new URL(url, location.href).origin === location.origin; } catch { return false; } }
+// Musicas enviadas pelo admin ficam no Drive, que nao deixa tocar direto em outro
+// site; o servidor do Ecoo entrega o arquivo (em base64) e o app monta o audio aqui.
+const pedidosServidor = new Map(); // id -> Promise<blob URL>
+function baixarDoServidor(m) {
+  if (prontas.has(m.id)) return Promise.resolve(prontas.get(m.id));
+  if (pedidosServidor.has(m.id)) return pedidosServidor.get(m.id);
+  const p = (async () => {
+    const d = await (await fetch(API + '?audio=' + encodeURIComponent(m.id))).json();
+    if (!d.ok) throw new Error(d.erro || 'falhou');
+    const bin = atob(d.dados), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: d.mime || 'audio/mpeg' }));
+    prontas.set(m.id, url);
+    return url;
+  })();
+  pedidosServidor.set(m.id, p);
+  p.finally(() => pedidosServidor.delete(m.id)).catch(() => {});
+  return p;
+}
 async function preCarregar() {
   const id = idProxima(), m = id && porId[id];
-  if (!m || prontas.has(id) || baixando === id || !mesmaOrigem(m.audio)) return;
+  if (!m || prontas.has(id) || baixando === id) return;
+  if (m.enviada) { if (API) baixarDoServidor(m).catch(() => {}); return; }
+  if (!mesmaOrigem(m.audio)) return;
   baixando = id;
   try {
     const r = await fetch(m.audio);
@@ -545,11 +566,35 @@ function limparProntas() {
   for (const [id, url] of prontas) if (!manter.has(id)) { URL.revokeObjectURL(url); prontas.delete(id); }
 }
 
+// iPhone so deixa tocar depois de uma espera (como a busca no servidor) se o player
+// ja tocou algo dentro de um toque da pessoa: no primeiro toque toca um silencio.
+const SILENCIO = 'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YZABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+document.addEventListener('pointerdown', () => {
+  if (audio.getAttribute('src')) return;
+  audio.src = SILENCIO;
+  audio.play().then(() => { if (audio.src === SILENCIO) audio.pause(); }).catch(() => {});
+}, { once: true, capture: true });
+
 function abrir(tocar = true) {
   const m = porId[estado.fila[estado.pos]];
   if (!m) return;
-  audio.src = prontas.get(m.id) || m.audio;
-  if (tocar) audio.play().catch(() => {});
+  if (m.enviada && !prontas.has(m.id)) {
+    // musica enviada pelo admin: busca no servidor antes de tocar
+    audio.pause(); audio.removeAttribute('src'); audio.load();
+    $('#pArtista').textContent = 'Carregando...';
+    baixarDoServidor(m).then(url => {
+      if (estado.fila[estado.pos] !== m.id) return; // a pessoa ja trocou de musica
+      audio.src = url;
+      $('#pArtista').textContent = m.artista;
+      if (tocar) audio.play().catch(() => {});
+    }).catch(() => {
+      if (estado.fila[estado.pos] !== m.id) return;
+      aviso('Não consegui carregar essa música. Pulando.'); setTimeout(() => proxima(false), 800);
+    });
+  } else {
+    audio.src = prontas.get(m.id) || m.audio;
+    if (tocar) audio.play().catch(() => {});
+  }
   limparProntas();
   $('#player').hidden = false;
   $('#pTitulo').textContent = m.titulo; $('#pArtista').textContent = m.artista;
@@ -636,10 +681,10 @@ audio.addEventListener('play', () => { atualizarPlay(); if ('mediaSession' in na
 audio.addEventListener('pause', () => { atualizarPlay(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused'; });
 audio.addEventListener('ended', () => proxima(false));
 audio.addEventListener('error', () => {
-  if (!audio.src) return;
+  if (!audio.getAttribute('src') || audio.src === SILENCIO) return;
   const m = porId[estado.fila[estado.pos]];
   // o arquivo pre-carregado falhou: tenta direto pela rede antes de pular
-  if (m && audio.src.startsWith('blob:')) { prontas.delete(m.id); audio.src = m.audio; audio.play().catch(() => {}); return; }
+  if (m && !m.enviada && audio.src.startsWith('blob:')) { prontas.delete(m.id); audio.src = m.audio; audio.play().catch(() => {}); return; }
   aviso('Não consegui carregar essa música. Pulando.'); setTimeout(() => proxima(false), 800);
 });
 // rede travou no meio da musica (comum com a tela apagada): recarrega do ponto em que parou
