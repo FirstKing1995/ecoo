@@ -647,7 +647,8 @@
   "genero": "Funk",
   "dur": 179,
   "audio": "audio/king-kabum.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "gabi-felismario-traidor",
@@ -656,7 +657,8 @@
   "genero": "Sertanejo",
   "dur": 163,
   "audio": "audio/gabi-felismario-traidor.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-crazy-dreams",
@@ -728,7 +730,8 @@
   "genero": "Sem gênero",
   "dur": 202,
   "audio": "audio/luds-three-hearts.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-gira-que-gira-versao-2",
@@ -737,7 +740,8 @@
   "genero": "Pontos",
   "dur": 277,
   "audio": "audio/king-gira-que-gira-versao-2.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-hipocritas",
@@ -765,7 +769,8 @@
   "genero": "Rock",
   "dur": 285,
   "audio": "audio/king-rumo-ao-topo.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-o-cravo-e-a-rosa",
@@ -784,7 +789,8 @@
   "genero": "Sertanejo",
   "dur": 191,
   "audio": "audio/king-por-que.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-proposta",
@@ -793,7 +799,8 @@
   "genero": "Sertanejo",
   "dur": 179,
   "audio": "audio/king-proposta.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-solteiro-de-novo",
@@ -866,7 +873,8 @@
   "genero": "Sem gênero",
   "dur": 399,
   "audio": "audio/enoihd-aiarbmac-viver.mp3",
-  "capa": "capas/enoihd-aiarbmac-viver.jpg"
+  "capa": "capas/enoihd-aiarbmac-viver.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-minha-coroa",
@@ -875,7 +883,8 @@
   "genero": "Sem gênero",
   "dur": 185,
   "audio": "audio/enoihd-aiarbmac-minha-coroa.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-number-1",
@@ -893,6 +902,7 @@
   "genero": "Sem gênero",
   "dur": 175,
   "audio": "audio/king-hipocritas-do-lado-1.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  }
 ]
