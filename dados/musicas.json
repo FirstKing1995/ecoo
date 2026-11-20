@@ -26,7 +26,8 @@
   "genero": "Reggae",
   "dur": 215,
   "audio": "audio/enoihd-aiarbmac-felix-felices.mp3",
-  "capa": "capas/enoihd-aiarbmac-felix-felices.jpg"
+  "capa": "capas/enoihd-aiarbmac-felix-felices.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-amiga",
@@ -35,7 +36,8 @@
   "genero": "Sem gênero",
   "dur": 319,
   "audio": "audio/enoihd-aiarbmac-amiga.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-brisa",
@@ -54,7 +56,8 @@
   "genero": "Sem gênero",
   "dur": 258,
   "audio": "audio/enoihd-aiarbmac-fumaca.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-venus",
@@ -63,7 +66,8 @@
   "genero": "Sem gênero",
   "dur": 358,
   "audio": "audio/enoihd-aiarbmac-venus.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "ben-quero-muito",
@@ -82,7 +86,8 @@
   "genero": "Eletrônica",
   "dur": 194,
   "audio": "audio/king-noites-de-prata.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-nossas-almas",
@@ -91,7 +96,8 @@
   "genero": "Eletrônica",
   "dur": 132,
   "audio": "audio/king-nossas-almas.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "pedro-bela-flor",
@@ -110,7 +116,8 @@
   "genero": "Eletrônica",
   "dur": 200,
   "audio": "audio/pedro-netflix.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "pedro-poison",
@@ -128,7 +135,8 @@
   "genero": "Eletrônica",
   "dur": 148,
   "audio": "audio/pedro-voce-ja-sentiu.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "sun-nao-para",
@@ -137,7 +145,8 @@
   "genero": "Eletrônica",
   "dur": 164,
   "audio": "audio/sun-nao-para.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "sun-so-good",
@@ -164,7 +173,8 @@
   "genero": "Sertanejo",
   "dur": 105,
   "audio": "audio/gabi-felismario-amor-eletronico.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "gabi-felismario-por-que",
@@ -173,7 +183,8 @@
   "genero": "Sertanejo",
   "dur": 202,
   "audio": "audio/gabi-felismario-por-que.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "gabi-felismario-solteira-de-novo",
@@ -182,7 +193,8 @@
   "genero": "Sertanejo",
   "dur": 199,
   "audio": "audio/gabi-felismario-solteira-de-novo.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "gabi-felismario-traidor-sem-edicao",
@@ -191,7 +203,8 @@
   "genero": "Sertanejo",
   "dur": 213,
   "audio": "audio/gabi-felismario-traidor-sem-edicao.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "luds-doesn-t-stop",
@@ -200,7 +213,8 @@
   "genero": "Sem gênero",
   "dur": 175,
   "audio": "audio/luds-doesn-t-stop.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "luds-dominated",
@@ -209,7 +223,8 @@
   "genero": "Sem gênero",
   "dur": 260,
   "audio": "audio/luds-dominated.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "luds-it-s-morning",
@@ -218,7 +233,8 @@
   "genero": "Sem gênero",
   "dur": 170,
   "audio": "audio/luds-it-s-morning.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "luds-touch",
@@ -227,7 +243,8 @@
   "genero": "Sem gênero",
   "dur": 222,
   "audio": "audio/luds-touch.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-gira-que-gira",
@@ -236,7 +253,8 @@
   "genero": "Pontos",
   "dur": 240,
   "audio": "audio/king-gira-que-gira.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-pomba-gira-menina",
@@ -245,7 +263,8 @@
   "genero": "Pontos",
   "dur": 91,
   "audio": "audio/king-pomba-gira-menina.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-pomba-gira-menina-versao-2",
@@ -254,7 +273,8 @@
   "genero": "Pontos",
   "dur": 344,
   "audio": "audio/king-pomba-gira-menina-versao-2.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-vem-me-ajudar-menina",
@@ -263,7 +283,8 @@
   "genero": "Pontos",
   "dur": 240,
   "audio": "audio/king-vem-me-ajudar-menina.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-carta-aberta",
@@ -272,7 +293,8 @@
   "genero": "Rap",
   "dur": 265,
   "audio": "audio/king-carta-aberta.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-inalcancavel",
@@ -281,7 +303,8 @@
   "genero": "Rap",
   "dur": 194,
   "audio": "audio/king-inalcancavel.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-meu-vicio",
@@ -290,7 +313,8 @@
   "genero": "Rap",
   "dur": 240,
   "audio": "audio/king-meu-vicio.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-voltei",
@@ -299,7 +323,8 @@
   "genero": "Rap",
   "dur": 154,
   "audio": "audio/king-voltei.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-burning-desire",
@@ -326,7 +351,8 @@
   "genero": "Rock",
   "dur": 218,
   "audio": "audio/king-god-of-iron.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-high-on-desire",
@@ -335,7 +361,8 @@
   "genero": "Rock",
   "dur": 199,
   "audio": "audio/king-high-on-desire.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-invisible-masks",
@@ -371,7 +398,8 @@
   "genero": "Sertanejo",
   "dur": 204,
   "audio": "audio/king-amor-que-se-foi.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-mangueira-fraca",
@@ -380,7 +408,8 @@
   "genero": "Sertanejo",
   "dur": 186,
   "audio": "audio/king-mangueira-fraca.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-paixao-sem-pudor",
@@ -389,7 +418,8 @@
   "genero": "Sertanejo",
   "dur": 213,
   "audio": "audio/king-paixao-sem-pudor.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-traidora",
@@ -398,7 +428,8 @@
   "genero": "Sertanejo",
   "dur": 156,
   "audio": "audio/king-traidora.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-velho-motel",
@@ -407,7 +438,8 @@
   "genero": "Sertanejo",
   "dur": 202,
   "audio": "audio/king-velho-motel.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-new-day",
@@ -416,7 +448,8 @@
   "genero": "R&B",
   "dur": 177,
   "audio": "audio/king-new-day.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-ancient-ritual",
@@ -434,7 +467,8 @@
   "genero": "Wicca",
   "dur": 199,
   "audio": "audio/king-ceol-draiochta.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-noite-do-encanto",
@@ -443,7 +477,8 @@
   "genero": "Wicca",
   "dur": 214,
   "audio": "audio/king-noite-do-encanto.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-nos-iremos-voltar",
@@ -452,7 +487,8 @@
   "genero": "Wicca",
   "dur": 239,
   "audio": "audio/king-nos-iremos-voltar.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-nega",
@@ -461,7 +497,8 @@
   "genero": "Sem gênero",
   "dur": 364,
   "audio": "audio/enoihd-aiarbmac-nega.mp3",
-  "capa": "capas/enoihd-aiarbmac-nega.jpg"
+  "capa": "capas/enoihd-aiarbmac-nega.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-de-volta-pro-passado",
@@ -470,7 +507,8 @@
   "genero": "Reggae",
   "dur": 205,
   "audio": "audio/enoihd-aiarbmac-de-volta-pro-passado.mp3",
-  "capa": "capas/enoihd-aiarbmac-de-volta-pro-passado.jpg"
+  "capa": "capas/enoihd-aiarbmac-de-volta-pro-passado.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-luxuria",
@@ -479,7 +517,8 @@
   "genero": "Sem gênero",
   "dur": 279,
   "audio": "audio/enoihd-aiarbmac-luxuria.mp3",
-  "capa": "capas/enoihd-aiarbmac-luxuria.jpg"
+  "capa": "capas/enoihd-aiarbmac-luxuria.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-ovelha",
@@ -488,7 +527,8 @@
   "genero": "Reggae",
   "dur": 178,
   "audio": "audio/enoihd-aiarbmac-ovelha.mp3",
-  "capa": "capas/enoihd-aiarbmac-ovelha.jpg"
+  "capa": "capas/enoihd-aiarbmac-ovelha.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-mercurio",
@@ -497,7 +537,8 @@
   "genero": "Sem gênero",
   "dur": 293,
   "audio": "audio/enoihd-aiarbmac-mercurio.mp3",
-  "capa": "capas/enoihd-aiarbmac-mercurio.jpg"
+  "capa": "capas/enoihd-aiarbmac-mercurio.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-so-brisa",
@@ -506,7 +547,8 @@
   "genero": "Reggae",
   "dur": 244,
   "audio": "audio/enoihd-aiarbmac-so-brisa.mp3",
-  "capa": "capas/enoihd-aiarbmac-so-brisa.jpg"
+  "capa": "capas/enoihd-aiarbmac-so-brisa.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-marte",
@@ -515,7 +557,8 @@
   "genero": "Sem gênero",
   "dur": 370,
   "audio": "audio/enoihd-aiarbmac-marte.mp3",
-  "capa": "capas/enoihd-aiarbmac-marte.jpg"
+  "capa": "capas/enoihd-aiarbmac-marte.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-viagem",
@@ -524,7 +567,8 @@
   "genero": "Reggae",
   "dur": 167,
   "audio": "audio/enoihd-aiarbmac-viagem.mp3",
-  "capa": "capas/enoihd-aiarbmac-viagem.jpg"
+  "capa": "capas/enoihd-aiarbmac-viagem.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-por-do-sol",
@@ -533,7 +577,8 @@
   "genero": "Sem gênero",
   "dur": 195,
   "audio": "audio/enoihd-aiarbmac-por-do-sol.mp3",
-  "capa": "capas/enoihd-aiarbmac-por-do-sol.jpg"
+  "capa": "capas/enoihd-aiarbmac-por-do-sol.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-metamorfose",
@@ -542,7 +587,8 @@
   "genero": "Sem gênero",
   "dur": 167,
   "audio": "audio/enoihd-aiarbmac-metamorfose.mp3",
-  "capa": "capas/enoihd-aiarbmac-metamorfose.jpg"
+  "capa": "capas/enoihd-aiarbmac-metamorfose.jpg",
+  "letra": 1
  },
  {
   "id": "king-a-proposta",
@@ -551,7 +597,8 @@
   "genero": "Sem gênero",
   "dur": 150,
   "audio": "audio/king-a-proposta.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-everyone-is-so-alike",
@@ -560,7 +607,8 @@
   "genero": "Melancólicas",
   "dur": 278,
   "audio": "audio/king-everyone-is-so-alike.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "ben-viciado-em-ti",
@@ -569,7 +617,8 @@
   "genero": "Eletrônica",
   "dur": 162,
   "audio": "audio/ben-viciado-em-ti.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "pedro-foda-se",
@@ -578,7 +627,8 @@
   "genero": "Eletrônica",
   "dur": 308,
   "audio": "audio/pedro-foda-se.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "pedro-rotina",
@@ -587,7 +637,8 @@
   "genero": "Eletrônica",
   "dur": 146,
   "audio": "audio/pedro-rotina.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-kabum",
@@ -695,7 +746,8 @@
   "genero": "Rock",
   "dur": 309,
   "audio": "audio/king-hipocritas.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-let-s-toast",
@@ -722,7 +774,8 @@
   "genero": "Sertanejo",
   "dur": 163,
   "audio": "audio/king-o-cravo-e-a-rosa.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-por-que",
@@ -749,7 +802,8 @@
   "genero": "Sertanejo",
   "dur": 191,
   "audio": "audio/king-solteiro-de-novo.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-african-goddess",
