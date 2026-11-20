@@ -6,13 +6,24 @@
 <title>Ecoo</title>
 <meta name="description" content="As músicas do King, separadas por gênero, para ouvir e compartilhar.">
 <meta name="theme-color" content="#0d0b08">
+<!-- previa do link no WhatsApp, Instagram e redes -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ecoo">
+<meta property="og:title" content="Ecoo · as músicas do King">
+<meta property="og:description" content="Ouça por gênero, monte suas playlists e mande para os amigos.">
+<meta property="og:url" content="https://firstking1995.github.io/ecoo/">
+<meta property="og:image" content="https://firstking1995.github.io/ecoo/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icone-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css?v=8">
+<link rel="stylesheet" href="estilo.css?v=9">
 </head>
 <body>
 <div class="app">
@@ -21,9 +32,12 @@
     <nav class="menu">
       <a href="#/" data-rota="inicio"><i data-lucide="house"></i>Início</a>
       <a href="#/buscar" data-rota="buscar"><i data-lucide="search"></i>Buscar</a>
+      <a href="#/biblioteca" data-rota="biblioteca"><i data-lucide="library"></i>Biblioteca</a>
       <a href="#/favoritas" data-rota="favoritas"><i data-lucide="heart"></i>Favoritas</a>
       <a href="#/voce" data-rota="voce"><i data-lucide="user-round"></i><span data-conta-nome>Entrar</span></a>
     </nav>
+    <div class="menu-titulo menu-titulo-acao">Playlists<button class="ico" id="novaListaLateral" aria-label="Nova playlist" title="Nova playlist"><i data-lucide="plus"></i></button></div>
+    <nav class="menu listas-menu" id="listasMenu"></nav>
     <div class="menu-titulo">Gêneros</div>
     <nav class="menu generos-menu" id="generosMenu"></nav>
   </aside>
@@ -33,7 +47,7 @@
   <nav class="abas">
     <a href="#/" data-rota="inicio"><i data-lucide="house"></i><span>Início</span></a>
     <a href="#/buscar" data-rota="buscar"><i data-lucide="search"></i><span>Buscar</span></a>
-    <a href="#/favoritas" data-rota="favoritas"><i data-lucide="heart"></i><span>Favoritas</span></a>
+    <a href="#/biblioteca" data-rota="biblioteca"><i data-lucide="library"></i><span>Biblioteca</span></a>
     <a href="#/voce" data-rota="voce"><i data-lucide="user-round"></i><span data-conta-nome>Entrar</span></a>
   </nav>
 
@@ -59,7 +73,9 @@
     <div class="p-direita">
       <button class="ico" id="bGenero" aria-label="Votar no gênero" title="Votar no gênero" hidden><i data-lucide="tag"></i></button>
       <button class="ico" id="bFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
-      <button class="ico" id="bCompartilhar" aria-label="Compartilhar"><i data-lucide="share-2"></i></button>
+      <button class="ico on" id="bTimer" aria-label="Timer para dormir ligado" hidden><i data-lucide="moon"></i></button>
+      <button class="ico" id="bFila" aria-label="Fila" title="Fila"><i data-lucide="list-music"></i></button>
+      <button class="ico" id="bMais" aria-label="Mais opções" title="Mais opções"><i data-lucide="ellipsis"></i></button>
       <i data-lucide="volume-2" class="vol-ico"></i>
       <input type="range" id="volume" min="0" max="100" value="90" aria-label="Volume">
     </div>
@@ -79,7 +95,9 @@
     <div><h2 id="tcTitulo"></h2><p id="tcArtista"></p></div>
     <div class="tc-acoes">
       <button class="ico" id="tcVotar" aria-label="Votar no gênero" hidden><i data-lucide="tag"></i></button>
+      <button class="ico on" id="tcTimer" aria-label="Timer para dormir ligado" hidden><i data-lucide="moon"></i></button>
       <button class="ico" id="tcFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
+      <button class="ico" id="tcMais" aria-label="Mais opções"><i data-lucide="ellipsis"></i></button>
     </div>
   </div>
   <input type="range" id="tcProgresso" min="0" max="1000" value="0" aria-label="Posição da música">
@@ -120,10 +138,26 @@
   </div>
 </div>
 
+<div class="voto menu-musica" id="menu" hidden>
+  <div class="voto-caixa" role="dialog" aria-modal="true" aria-label="Opções da música">
+    <div class="voto-topo"><div class="menu-cab" id="menuCab"></div><button class="ico" id="menuFechar" aria-label="Fechar"><i data-lucide="x"></i></button></div>
+    <div class="menu-itens" id="menuItens"></div>
+  </div>
+</div>
+
+<div class="voto" id="campo" hidden>
+  <form class="voto-caixa" id="campoForm" role="dialog" aria-modal="true" aria-labelledby="campoTitulo">
+    <div class="voto-topo"><h3 id="campoTitulo"></h3><button class="ico" type="button" id="campoFechar" aria-label="Fechar"><i data-lucide="x"></i></button></div>
+    <input class="campo-texto" id="campoTexto" maxlength="60" autocomplete="off" placeholder="Nome da playlist">
+    <div class="acoes"><button class="btn btn-ouro" id="campoOk" type="submit"><i data-lucide="check"></i><span>Salvar</span></button></div>
+  </form>
+</div>
+
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="config.js?v=8"></script>
-<script src="app.js?v=8"></script>
+<script src="config.js?v=9"></script>
+<script src="app.js?v=9"></script>
+<script src="biblioteca.js?v=9"></script>
 </body>
 </html>

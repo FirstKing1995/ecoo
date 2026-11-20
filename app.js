@@ -152,7 +152,7 @@ function aviso(txt) {
 }
 
 // ---------- Telas ----------
-function faixasHTML(lista, mostrarGenero = false) {
+function faixasHTML(lista, mostrarGenero = false, ctx = '') {
   if (!lista.length) return `<div class="vazio"><i data-lucide="music-2"></i><p>Nada por aqui ainda.</p></div>`;
   const atual = estado.fila[estado.pos];
   return `<div class="faixas">` + lista.map((m, i) => {
@@ -167,6 +167,7 @@ function faixasHTML(lista, mostrarGenero = false) {
       ${votavel(m) ? `<button class="btn-votar ${votos.meus[m.id] ? 'on' : ''}" data-abrir-voto="${m.id}"><i data-lucide="tag"></i><span>${votos.meus[m.id] ? esc(votos.meus[m.id]) : 'Votar gênero'}</span></button>` : '<span></span>'}
       <button class="ico fav-faixa ${estado.favs.has(m.id) ? 'on' : ''}" data-fav="${m.id}" aria-label="Favoritar"><i data-lucide="heart"></i></button>
       <span class="dur">${tempo(m.dur)}</span>
+      <button class="ico mais-faixa" data-menu="${m.id}"${ctx ? ` data-menu-ctx="${esc(ctx)}"` : ''} aria-label="Mais opções de ${esc(m.titulo)}"><i data-lucide="ellipsis-vertical"></i></button>
     </div>`;
   }).join('') + `</div>`;
 }
@@ -180,6 +181,7 @@ function cardMusica(m, ctx) {
 const GOOGLE_ID = window.ECOO_GOOGLE_CLIENT_ID || '';
 let conta = ler('conta', null); // { token, usuario }
 estado.plays = ler('plays', {});          // total de vezes que cada musica foi ouvida
+estado.listas = ler('listas', []);        // playlists (biblioteca.js)
 let playsPend = ler('playsPend', {});     // ainda nao enviadas para a conta
 let emailCodigo = '';
 
@@ -203,8 +205,8 @@ async function enviarPerfil(keepalive) {
   if (!conta || !API) return;
   const enviando = playsPend; playsPend = {}; guardar('playsPend', playsPend);
   try {
-    const d = await api({ acao: 'salvarPerfil', token: conta.token, favs: [...estado.favs], plays: enviando }, keepalive ? { keepalive: true } : null);
-    if (d.ok) { estado.plays = { ...d.perfil.plays }; for (const [k, n] of Object.entries(playsPend)) estado.plays[k] = (estado.plays[k] || 0) + n; guardar('plays', estado.plays); }
+    const d = await api({ acao: 'salvarPerfil', token: conta.token, favs: [...estado.favs], plays: enviando, listas: estado.listas }, keepalive ? { keepalive: true } : null);
+    if (d.ok) { mesclarListas(d.perfil.listas); estado.plays = { ...d.perfil.plays }; for (const [k, n] of Object.entries(playsPend)) estado.plays[k] = (estado.plays[k] || 0) + n; guardar('plays', estado.plays); }
     else if (d.sessao === false) { sairLocal('Sua sessão venceu. Entre de novo.'); }
     else throw 0;
   } catch {
@@ -220,6 +222,7 @@ function aplicarLogin(d) {
   // junta o que estava no aparelho com o que estava na conta
   const p = d.perfil || { favs: [], plays: {} };
   p.favs.forEach(id => estado.favs.add(id)); guardar('favs', [...estado.favs]);
+  mesclarListas(p.listas);
   estado.plays = { ...p.plays };
   for (const [k, n] of Object.entries(playsPend)) estado.plays[k] = (estado.plays[k] || 0) + n;
   guardar('plays', estado.plays);
@@ -242,7 +245,11 @@ async function conferirConta() {
   if (!conta || !API) return;
   try {
     const d = await api({ acao: 'perfil', token: conta.token });
-    if (d.ok) { conta.usuario = d.usuario; guardar('conta', conta); d.perfil.favs.forEach(id => estado.favs.add(id)); guardar('favs', [...estado.favs]); atualizarContaUI(); }
+    if (d.ok) {
+      conta.usuario = d.usuario; guardar('conta', conta); d.perfil.favs.forEach(id => estado.favs.add(id)); guardar('favs', [...estado.favs]);
+      if (mesclarListas(d.perfil.listas)) sincronizar(); // havia mudanca so neste aparelho
+      atualizarContaUI(); montarListasMenu();
+    }
     else if (d.sessao === false) sairLocal('Sua sessão venceu. Entre de novo.');
   } catch {}
 }
@@ -473,7 +480,8 @@ function rotaBase() {
     return;
   }
   if (tipo === 'genero') return render('genero', arg);
-  if (tipo === 'buscar' || tipo === 'favoritas' || tipo === 'voce') return render(tipo);
+  if (tipo === 'buscar' || tipo === 'favoritas' || tipo === 'voce' || tipo === 'fila' || tipo === 'biblioteca') return render(tipo);
+  if (tipo === 'playlist' || tipo === 'compartilhada') return render(tipo, arg);
   if (!tipo) return render('inicio');
   render('naoAchou');
 }
@@ -483,7 +491,8 @@ function render(tela, arg) {
   c.scrollTop = 0;
   document.querySelectorAll('[data-rota]').forEach(a => a.classList.toggle('ativo', a.dataset.rota === tela));
   document.querySelectorAll('#generosMenu a').forEach(a => a.classList.toggle('ativo', tela === 'genero' && a.dataset.g === arg));
-  document.title = tela === 'genero' ? arg + ' · Ecoo' : 'Ecoo';
+  document.title = tela === 'genero' ? arg + ' · Ecoo' : tela === 'playlist' && listaPorId(arg) ? listaPorId(arg).nome + ' · Ecoo' : 'Ecoo';
+  if (tela === 'biblioteca' || tela === 'playlist') document.querySelectorAll('[data-rota="biblioteca"]').forEach(a => a.classList.add('ativo'));
   if (tela === 'buscar') { const i = $('#busca'); i.addEventListener('input', () => buscar(i.value)); i.focus(); }
   icones();
 }
@@ -535,11 +544,28 @@ function baixarDoServidor(m) {
   if (prontas.has(m.id)) return Promise.resolve(prontas.get(m.id));
   if (pedidosServidor.has(m.id)) return pedidosServidor.get(m.id);
   const p = (async () => {
-    const d = await (await fetch(API + '?audio=' + encodeURIComponent(m.id))).json();
-    if (!d.ok) throw new Error(d.erro || 'falhou');
-    const bin = atob(d.dados), bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    const url = URL.createObjectURL(new Blob([bytes], { type: d.mime || 'audio/mpeg' }));
+    // depois da primeira vez a musica fica guardada no aparelho e comeca na hora
+    const chave = new URL('_audio/' + m.id, location.href).href;
+    let cache = null;
+    try { cache = await caches.open('ecoo-audios'); } catch {}
+    const guardada = cache && await cache.match(chave).catch(() => null);
+    let blob;
+    if (guardada) blob = await guardada.blob();
+    else {
+      const d = await (await fetch(API + '?audio=' + encodeURIComponent(m.id))).json();
+      if (!d.ok) throw new Error(d.erro || 'falhou');
+      const bin = atob(d.dados), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      blob = new Blob([bytes], { type: d.mime || 'audio/mpeg' });
+      if (cache) {
+        try {
+          await cache.put(chave, new Response(blob, { headers: { 'Content-Type': blob.type } }));
+          const chaves = await cache.keys(); // guarda no maximo 40 musicas
+          for (const k of chaves.slice(0, Math.max(0, chaves.length - 40))) await cache.delete(k);
+        } catch {}
+      }
+    }
+    const url = URL.createObjectURL(blob);
     prontas.set(m.id, url);
     return url;
   })();
@@ -613,6 +639,7 @@ function abrir(tocar = true) {
 }
 function proxima(manual = true) {
   if (!estado.fila.length) return;
+  if (!manual && typeof pararNoFim === 'function' && pararNoFim()) { pausar(); return; } // timer para dormir
   if (!manual && estado.repetir === 'uma') { audio.currentTime = 0; audio.play(); return; }
   if (estado.pos < estado.fila.length - 1) estado.pos++;
   else if (estado.repetir === 'todas' || manual) estado.pos = 0;
@@ -716,7 +743,7 @@ const cliques = {
   '#bAleatorio': mudarAleatorio, '#tcAleatorio': mudarAleatorio,
   '#bRepetir': mudarRepetir, '#tcRepetir': mudarRepetir,
   '#bFav': () => favoritar(estado.fila[estado.pos]), '#tcFav': () => favoritar(estado.fila[estado.pos]),
-  '#bCompartilhar': compartilharAtual, '#tcCompartilhar': compartilharAtual,
+  '#tcCompartilhar': compartilharAtual,
   '#pInfo': () => { if (matchMedia('(max-width: 820px)').matches) { $('#telaCheia').hidden = false; icones(); } else { const m = porId[estado.fila[estado.pos]]; if (m) location.hash = '#/genero/' + encodeURIComponent(m.genero); } },
   '#tcFechar': () => { $('#telaCheia').hidden = true; },
 };
@@ -740,6 +767,8 @@ function mudarRepetir() {
 
 // Cliques no conteudo
 $('#conteudo').addEventListener('click', e => {
+  const mn = e.target.closest('[data-menu]');
+  if (mn) { e.stopPropagation(); return abrirMenu(mn.dataset.menu, mn.dataset.menuCtx || ''); }
   const av = e.target.closest('[data-abrir-voto]');
   if (av) { e.stopPropagation(); return abrirVoto(av.dataset.abrirVoto); }
   const fav = e.target.closest('[data-fav]');
