@@ -84,7 +84,7 @@ function montarCatalogo() {
 function aplicarEstado(d) {
   if (!d || !d.ok) return false;
   votos.todos = d.votos || {}; votos.fixos = d.fixos || {};
-  catalogo = { inativas: d.inativas || [], enviadas: d.enviadas || [] };
+  catalogo = { inativas: d.inativas || [], enviadas: d.enviadas || [], letras: d.letras || {} };
   guardar('catalogo', catalogo);
   montarCatalogo(); return true;
 }
@@ -480,7 +480,7 @@ function rotaBase() {
     return;
   }
   if (tipo === 'genero') return render('genero', arg);
-  if (tipo === 'buscar' || tipo === 'favoritas' || tipo === 'voce' || tipo === 'fila' || tipo === 'biblioteca') return render(tipo);
+  if (tipo === 'buscar' || tipo === 'favoritas' || tipo === 'voce' || tipo === 'fila' || tipo === 'biblioteca' || tipo === 'letra') return render(tipo);
   if (tipo === 'playlist' || tipo === 'compartilhada') return render(tipo, arg);
   if (!tipo) return render('inicio');
   render('naoAchou');
@@ -631,6 +631,7 @@ function abrir(tocar = true) {
   $('#telaCheia').style.setProperty('--cor', cor(m));
   $('#tTotal').textContent = $('#tcTotal').textContent = tempo(m.dur);
   atualizarFav(); atualizarGeneroPlayer(); marcarTocando(); icones();
+  if (window.aoTrocarMusica) aoTrocarMusica(m);
   estado.recentes = [m.id, ...estado.recentes.filter(id => id !== m.id)].slice(0, 20); guardar('recentes', estado.recentes);
   if ('mediaSession' in navigator) {
     const art = m.capa ? [{ src: m.capa, sizes: '400x400', type: 'image/jpeg' }] : [{ src: 'icone-512.png', sizes: '512x512', type: 'image/png' }];

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css?v=9">
+<link rel="stylesheet" href="estilo.css?v=10">
 <style>
   body { overflow: auto; }
   [hidden] { display: none !important; }
@@ -145,7 +145,7 @@
 <input type="file" id="capaArquivo" accept="image/*" hidden>
 
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="config.js?v=9"></script>
+<script src="config.js?v=10"></script>
 <script>
 const API = window.TRONO_API, $ = s => document.querySelector(s);
 const SEM = 'Sem gênero', LIMITE = 30 * 1024 * 1024;
@@ -228,6 +228,7 @@ function desenhar() {
         <small>${esc(m.artista)} · ${tempo(m.dur)}${m.votosTxt ? ' · votos: ' + esc(m.votosTxt) : ''}</small>
         <span class="mini">
           <button data-ouvir="${esc(m.id)}"><i data-lucide="headphones"></i>Ouvir</button>
+          <button data-letra="${esc(m.id)}"><i data-lucide="mic-vocal"></i>${(est.letras || {})[m.id] ? 'Letra revisada' : m.letra ? 'Letra da IA' : 'Sem letra'}</button>
           ${m.enviada ? `<button data-renomear="${esc(m.id)}"><i data-lucide="pencil"></i>Renomear</button>
           <button data-apagar="${esc(m.id)}"><i data-lucide="trash-2"></i>Apagar</button>` : ''}
         </span></div>
@@ -392,5 +393,6 @@ $('#enviarTudo').addEventListener('click', async () => {
   desenhar();
 });
 </script>
+<script src="admin-letra.js?v=10"></script>
 </body>
 </html>

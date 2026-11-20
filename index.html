@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css?v=9">
+<link rel="stylesheet" href="estilo.css?v=10">
 </head>
 <body>
 <div class="app">
@@ -74,6 +74,7 @@
       <button class="ico" id="bGenero" aria-label="Votar no gênero" title="Votar no gênero" hidden><i data-lucide="tag"></i></button>
       <button class="ico" id="bFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
       <button class="ico on" id="bTimer" aria-label="Timer para dormir ligado" hidden><i data-lucide="moon"></i></button>
+      <button class="ico" id="bLetra" aria-label="Letra" title="Letra" hidden><i data-lucide="mic-vocal"></i></button>
       <button class="ico" id="bFila" aria-label="Fila" title="Fila"><i data-lucide="list-music"></i></button>
       <button class="ico" id="bMais" aria-label="Mais opções" title="Mais opções"><i data-lucide="ellipsis"></i></button>
       <i data-lucide="volume-2" class="vol-ico"></i>
@@ -91,11 +92,13 @@
     <button class="ico" id="tcCompartilhar" aria-label="Compartilhar"><i data-lucide="share-2"></i></button>
   </div>
   <div class="capa tc-capa" id="tcCapa"></div>
+  <div class="letra-caixa tc-letra" data-letra-caixa></div>
   <div class="tc-linha">
     <div><h2 id="tcTitulo"></h2><p id="tcArtista"></p></div>
     <div class="tc-acoes">
       <button class="ico" id="tcVotar" aria-label="Votar no gênero" hidden><i data-lucide="tag"></i></button>
       <button class="ico on" id="tcTimer" aria-label="Timer para dormir ligado" hidden><i data-lucide="moon"></i></button>
+      <button class="ico" id="tcLetra" aria-label="Letra" hidden><i data-lucide="mic-vocal"></i></button>
       <button class="ico" id="tcFav" aria-label="Favoritar"><i data-lucide="heart"></i></button>
       <button class="ico" id="tcMais" aria-label="Mais opções"><i data-lucide="ellipsis"></i></button>
     </div>
@@ -156,8 +159,9 @@
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="config.js?v=9"></script>
-<script src="app.js?v=9"></script>
-<script src="biblioteca.js?v=9"></script>
+<script src="config.js?v=10"></script>
+<script src="app.js?v=10"></script>
+<script src="biblioteca.js?v=10"></script>
+<script src="letra.js?v=10"></script>
 </body>
 </html>

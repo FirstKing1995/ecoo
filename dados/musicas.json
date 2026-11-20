@@ -6,7 +6,8 @@
   "genero": "Sertanejo",
   "dur": 159,
   "audio": "audio/king-dia-de-comemorar.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-noite-de-loucuras",
@@ -15,7 +16,8 @@
   "genero": "Reggae",
   "dur": 233,
   "audio": "audio/enoihd-aiarbmac-noite-de-loucuras.mp3",
-  "capa": "capas/enoihd-aiarbmac-noite-de-loucuras.jpg"
+  "capa": "capas/enoihd-aiarbmac-noite-de-loucuras.jpg",
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-felix-felices",
@@ -42,7 +44,8 @@
   "genero": "Sem gênero",
   "dur": 276,
   "audio": "audio/enoihd-aiarbmac-brisa.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "enoihd-aiarbmac-fumaca",
@@ -69,7 +72,8 @@
   "genero": "Eletrônica",
   "dur": 176,
   "audio": "audio/ben-quero-muito.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "king-noites-de-prata",
@@ -96,7 +100,8 @@
   "genero": "Eletrônica",
   "dur": 212,
   "audio": "audio/pedro-bela-flor.mp3",
-  "capa": null
+  "capa": null,
+  "letra": 1
  },
  {
   "id": "pedro-netflix",
