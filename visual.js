@@ -18,6 +18,7 @@ const GATILHOS = [
 ];
 
 const $v = s => document.querySelector(s);
+const ehTV = document.documentElement.classList.contains('tv');
 document.body.insertAdjacentHTML('beforeend', `
 <div class="modo-visual" id="modoVisual" hidden>
   <canvas id="mvTela"></canvas>
@@ -52,6 +53,13 @@ function amostra(v, t) {
   return v[i] * (1 - f) + v[i + 1] * f;
 }
 async function carregarRitmo(m) {
+  const medido = (catalogo.ritmos || {})[m.id];
+  if (medido && API) { // musica enviada, medida no admin
+    try {
+      const r = await (await fetch(API + '?ritmo=' + encodeURIComponent(m.id))).json();
+      if (r.ok) { const d = r.ritmo; return { bpm: d.bpm, batidas: d.batidas, fps: d.fps || 20, e: decodificar(d.e), g: decodificar(d.g), a: decodificar(d.a) }; }
+    } catch {}
+  }
   if (m.ritmo) {
     try {
       const d = await (await fetch('ritmo/' + m.id + '.json?v=' + m.ritmo)).json();
@@ -104,7 +112,7 @@ function fundo(h1, h2, l1 = 8, l2 = 3, s = 60) {
 
 // ---------- particulas (efeitos da letra e das batidas) ----------
 function soltar(tipo, n, x, y, forca = 1) {
-  for (let i = 0; i < n && parts.length < 420; i++) {
+  for (let i = 0; i < n && parts.length < limiteParts; i++) {
     const ang = rnd(0, Math.PI * 2), v = rnd(60, 260) * forca;
     const p = { tipo, x: x ?? rnd(0, W), y: y ?? rnd(0, H), vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, vida: 0, max: rnd(1.4, 3), r: rnd(6, 16), giro: rnd(-4, 4), ang: rnd(0, 6), h: matiz + rnd(-30, 30) };
     if (tipo === 'confete') { p.y = y ?? -10; p.vx = rnd(-120, 120); p.vy = rnd(80, 260); p.max = rnd(2.5, 4.5); p.h = rnd(0, 360); p.r = rnd(5, 10); }
@@ -512,15 +520,29 @@ function pintarPalavras(t, i) {
 }
 
 // ---------- laco principal ----------
+// qualidade automatica: se a animacao engasgar (TV, celular fraco), desenha em resolucao menor
+let escala = ehTV ? 0.75 : 1, baixou = 0, somaQuadros = 0, nQuadros = 0, limiteParts = 420;
 function redimensionar() {
-  DPR = Math.min(window.devicePixelRatio || 1, W * H > 1.2e6 ? 1 : 1.5);
-  W = tela.clientWidth; H = tela.clientHeight;
+  const w = tela.clientWidth, h = tela.clientHeight, mudou = w !== W || h !== H;
+  W = w; H = h;
+  DPR = Math.max(0.4, Math.min(window.devicePixelRatio || 1, W * H > 1.2e6 ? 1 : 1.5) * escala);
   tela.width = Math.round(W * DPR); tela.height = Math.round(H * DPR);
-  if (nomeCena) cena = CENAS[nomeCena]();
+  limiteParts = Math.round(420 * Math.min(1, escala));
+  if (nomeCena && (mudou || !cena)) cena = CENAS[nomeCena]();
 }
+function medirFluidez(intervalo) {
+  if (document.hidden || intervalo > 200) return;
+  somaQuadros += intervalo; nQuadros++;
+  if (nQuadros < 90) return;
+  const media = somaQuadros / nQuadros; somaQuadros = 0; nQuadros = 0;
+  if (media > 24 && escala > 0.45) { escala *= 0.75; baixou++; redimensionar(); }        // abaixo de ~40 quadros/s: alivia
+  else if (media < 17.5 && escala < 1 && baixou < 2) { escala = Math.min(1, escala / 0.85); redimensionar(); } // sobrando: melhora
+}
+
 function passo(agora) {
   if (!aberto) return;
   quadro = requestAnimationFrame(passo);
+  if (ultimo) medirFluidez(agora - ultimo);
   const dt = Math.min(0.05, (agora - (ultimo || agora)) / 1000); ultimo = agora;
   if (!R || !cena) return;
   const t = audio.currentTime || 0;
@@ -569,7 +591,7 @@ async function prepararMusica() {
   const m = porId[estado.fila[estado.pos]];
   if (!m) return;
   M = m; R = null; batidaIdx = -1; linhaIdx = -2; letraDados = null; parts.length = 0;
-  nomeCena = m.cena || CENAS_GENERO[m.genero] || 'neon';
+  nomeCena = (catalogo.cenas || {})[m.id] || m.cena || CENAS_GENERO[m.genero] || 'neon';
   cena = CENAS[nomeCena]();
   $v('#mvTitulo').textContent = m.titulo; $v('#mvArtista').textContent = m.artista;
   $v('#mvCena').textContent = NOMES[nomeCena];
@@ -585,6 +607,8 @@ async function abrirVisual() {
   const el = $v('#modoVisual');
   el.hidden = false; aberto = true; icones();
   document.body.classList.add('em-visual');
+  // o botao Voltar (celular e controle da TV) fecha o modo visual em vez de sair da pagina
+  if (!(history.state && history.state.visual)) history.pushState({ visual: 1 }, '', location.href);
   // tela cheia de verdade e tela sempre acesa: pede sem esperar (alguns celulares nem respondem)
   try { if (el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch {}
   try { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(t => { travaTela = t; }).catch(() => {}); } catch {}
@@ -593,7 +617,9 @@ async function abrirVisual() {
   cancelAnimationFrame(quadro); ultimo = 0; quadro = requestAnimationFrame(passo);
   await prepararMusica();
 }
-function fecharVisual() {
+function fecharVisual(peloVoltar) {
+  if (!aberto) return;
+  if (peloVoltar !== true && history.state && history.state.visual) { history.back(); return; } // o popstate fecha
   aberto = false; cancelAnimationFrame(quadro);
   $v('#modoVisual').hidden = true; document.body.classList.remove('em-visual');
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -625,4 +651,5 @@ document.addEventListener('visibilitychange', async () => {
 const antes = window.aoTrocarMusica;
 window.aoTrocarMusica = m => { if (antes) antes(m); if (aberto) prepararMusica(); };
 window.abrirVisual = abrirVisual;
+window.addEventListener('popstate', () => { if (aberto) fecharVisual(true); });
 })();

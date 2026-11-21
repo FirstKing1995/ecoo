@@ -450,3 +450,16 @@ p.agora .pontos i:nth-child(2) { animation-delay: .2s; } p.agora .pontos i:nth-c
 @keyframes mvEntra { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; } }
 .mv-prox { margin: 12px auto 0; max-width: 760px; font-size: clamp(15px, 2.4vw, 22px); font-weight: 600; opacity: .5; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 body.em-visual .tela-cheia { visibility: hidden; }
+
+/* Modo TV (controle remoto): foco grande e bem visível de longe */
+.tv body { cursor: none; }
+.tv :focus { outline: none; }
+.tv :focus-visible, .tv a:focus, .tv button:focus, .tv [tabindex]:focus, .tv input:focus, .tv select:focus {
+  outline: 3px solid var(--ouro); outline-offset: 3px; border-radius: 10px;
+  box-shadow: 0 0 0 7px rgba(226, 178, 60, .22);
+}
+.tv .card-musica:focus, .tv .card-genero:focus, .tv .card-lista:focus { transform: scale(1.06); transition: transform .15s; z-index: 1; position: relative; }
+.tv .faixa:focus { background: var(--painel-2); }
+.tv .conteudo { scroll-behavior: smooth; }
+.tv .p-mini-barra, .tv .p-play-mini { display: none; }
+.tv .mv-botoes .ico:focus { transform: scale(1.12); }

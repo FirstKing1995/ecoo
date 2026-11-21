@@ -84,7 +84,7 @@ function montarCatalogo() {
 function aplicarEstado(d) {
   if (!d || !d.ok) return false;
   votos.todos = d.votos || {}; votos.fixos = d.fixos || {};
-  catalogo = { inativas: d.inativas || [], enviadas: d.enviadas || [], letras: d.letras || {} };
+  catalogo = { inativas: d.inativas || [], enviadas: d.enviadas || [], letras: d.letras || {}, cenas: d.cenas || {}, ritmos: d.ritmos || {} };
   guardar('catalogo', catalogo);
   montarCatalogo(); return true;
 }

@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ecoo</title>
+<script>
+// modo TV: ?tv=1 liga (fica lembrado), ?tv=0 desliga; TVs conhecidas ligam sozinhas
+(function () {
+  var q = new URLSearchParams(location.search).get('tv'), tv = false;
+  try { if (q === '1') localStorage.setItem('trono.tv', '1'); if (q === '0') localStorage.removeItem('trono.tv'); tv = localStorage.getItem('trono.tv') === '1'; } catch (e) {}
+  if (q === null && /Android TV|GoogleTV|AFT[A-Z]|SmartTV|SMART-TV|BRAVIA|NETTV|Philips|TPM\d|; TV\)|Tizen|Web0S/i.test(navigator.userAgent)) tv = true;
+  if (tv) document.documentElement.classList.add('tv');
+})();
+</script>
 <meta name="description" content="As músicas do King, separadas por gênero, para ouvir e compartilhar.">
 <meta name="theme-color" content="#0d0b08">
 <!-- previa do link no WhatsApp, Instagram e redes -->
@@ -23,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css?v=11">
+<link rel="stylesheet" href="estilo.css?v=12">
 </head>
 <body>
 <div class="app">
@@ -158,11 +167,12 @@
 
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
-<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="config.js?v=11"></script>
-<script src="app.js?v=11"></script>
-<script src="biblioteca.js?v=11"></script>
-<script src="letra.js?v=11"></script>
-<script src="visual.js?v=11"></script>
+<script src="icones.js?v=12"></script>
+<script src="config.js?v=12"></script>
+<script src="app.js?v=12"></script>
+<script src="biblioteca.js?v=12"></script>
+<script src="letra.js?v=12"></script>
+<script src="visual.js?v=12"></script>
+<script src="tv.js?v=12"></script>
 </body>
 </html>

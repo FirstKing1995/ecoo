@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilo.css?v=11">
+<link rel="stylesheet" href="estilo.css?v=12">
 <style>
   body { overflow: auto; }
   [hidden] { display: none !important; }
@@ -48,7 +48,8 @@
   .linha .nome strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .linha .nome small { color: var(--texto-2); font-size: 13px; display: block; }
   .linha .nome .tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--ouro); border: 1px solid #5a4a20; border-radius: 999px; padding: 0 7px; margin-left: 6px; vertical-align: 2px; }
-  .linha .mini { display: inline-flex; gap: 2px; margin-top: 2px; }
+  .linha .mini { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px; margin-top: 2px; }
+  .linha .mini .sel-cena { height: 26px; font-size: 12px; padding: 0 6px; border-radius: 6px; width: auto; color: var(--texto-2); background: var(--painel); }
   .linha .mini button { font-size: 12px; color: var(--texto-2); padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
   .linha .mini button:hover { color: var(--texto); background: var(--painel-2); }
   .linha .mini svg.lucide { width: 13px; height: 13px; }
@@ -129,7 +130,7 @@
 
     <section id="aba-enviar" hidden>
       <label class="soltar" id="soltar">
-        <i data-lucide="upload-cloud"></i>
+        <i data-lucide="cloud-upload"></i>
         <strong>Arraste as músicas aqui ou clique para escolher</strong>
         <span>MP3, M4A, WAV ou OGG, até 30 MB cada. Vão para a pasta "Ecoo - Musicas" do seu Google Drive.</span>
         <input type="file" id="arquivos" accept="audio/*" multiple hidden>
@@ -144,8 +145,8 @@
 </div>
 <input type="file" id="capaArquivo" accept="image/*" hidden>
 
-<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="config.js?v=11"></script>
+<script src="icones.js?v=12"></script>
+<script src="config.js?v=12"></script>
 <script>
 const API = window.TRONO_API, $ = s => document.querySelector(s);
 const SEM = 'Sem gênero', LIMITE = 30 * 1024 * 1024;
@@ -385,6 +386,7 @@ $('#enviarTudo').addEventListener('click', async () => {
       const mime = i.f.type === 'audio/mp3' ? 'audio/mpeg' : i.f.type;
       est = await post({ acao: 'enviar', titulo: i.titulo, artista: i.artista, genero: i.genero, dur: i.dur, mime, dados: await base64(i.f), capa: i.capa });
       i.estado = 'ok'; ok++;
+      if (window.medirDepois) await medirDepois(est.novaId, i.f);
     } catch (e) { i.estado = 'falhou:' + (e.message === 'Failed to fetch' ? 'Sem conexão, tente de novo.' : e.message); }
     desenharFila();
   }
@@ -393,6 +395,7 @@ $('#enviarTudo').addEventListener('click', async () => {
   desenhar();
 });
 </script>
-<script src="admin-letra.js?v=11"></script>
+<script src="admin-letra.js?v=12"></script>
+<script src="admin-visual.js?v=12"></script>
 </body>
 </html>
