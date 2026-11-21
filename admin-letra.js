@@ -225,7 +225,7 @@ function transcrever(host, arq) {
     };
   });
 }
-const LIXO_IA = [/^\[.*\]$/, /^\(.*\)$/, /amara\.org/i, /legendas? (pela|por)/i, /obrigad[oa] por assistir/i, /inscreva-se/i, /^\W*$/];
+const LIXO_IA = [/[♪♫]/, /^\[.*\]$/, /^\(.*\)$/, /amara\.org/i, /legendas? (pela|por)/i, /obrigad[oa] por assistir/i, /inscreva-se/i, /^\W*$/];
 function segmentosParaLinhas(segs) {
   const linhas = []; let fim = 0;
   for (const s of segs) {

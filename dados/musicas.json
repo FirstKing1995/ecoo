@@ -7,6 +7,8 @@
   "dur": 159,
   "audio": "audio/king-dia-de-comemorar.mp3",
   "capa": null,
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -17,6 +19,8 @@
   "dur": 233,
   "audio": "audio/enoihd-aiarbmac-noite-de-loucuras.mp3",
   "capa": "capas/enoihd-aiarbmac-noite-de-loucuras.jpg",
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -27,6 +31,8 @@
   "dur": 215,
   "audio": "audio/enoihd-aiarbmac-felix-felices.mp3",
   "capa": "capas/enoihd-aiarbmac-felix-felices.jpg",
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -37,6 +43,8 @@
   "dur": 319,
   "audio": "audio/enoihd-aiarbmac-amiga.mp3",
   "capa": null,
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -47,6 +55,8 @@
   "dur": 276,
   "audio": "audio/enoihd-aiarbmac-brisa.mp3",
   "capa": null,
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -57,6 +67,8 @@
   "dur": 258,
   "audio": "audio/enoihd-aiarbmac-fumaca.mp3",
   "capa": null,
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -67,6 +79,8 @@
   "dur": 358,
   "audio": "audio/enoihd-aiarbmac-venus.mp3",
   "capa": null,
+  "cena": "cosmos",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -77,6 +91,8 @@
   "dur": 176,
   "audio": "audio/ben-quero-muito.mp3",
   "capa": null,
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -87,6 +103,8 @@
   "dur": 194,
   "audio": "audio/king-noites-de-prata.mp3",
   "capa": null,
+  "cena": "noite",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -97,7 +115,8 @@
   "dur": 132,
   "audio": "audio/king-nossas-almas.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "noite",
+  "ritmo": 1
  },
  {
   "id": "pedro-bela-flor",
@@ -107,6 +126,8 @@
   "dur": 212,
   "audio": "audio/pedro-bela-flor.mp3",
   "capa": null,
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -117,6 +138,8 @@
   "dur": 200,
   "audio": "audio/pedro-netflix.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -126,7 +149,9 @@
   "genero": "Eletrônica",
   "dur": 160,
   "audio": "audio/pedro-poison.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "neon",
+  "ritmo": 1
  },
  {
   "id": "pedro-voce-ja-sentiu",
@@ -136,6 +161,8 @@
   "dur": 148,
   "audio": "audio/pedro-voce-ja-sentiu.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -146,6 +173,8 @@
   "dur": 164,
   "audio": "audio/sun-nao-para.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -155,7 +184,9 @@
   "genero": "Eletrônica",
   "dur": 152,
   "audio": "audio/sun-so-good.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "neon",
+  "ritmo": 1
  },
  {
   "id": "sun-soulmates",
@@ -164,7 +195,9 @@
   "genero": "Eletrônica",
   "dur": 182,
   "audio": "audio/sun-soulmates.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "neon",
+  "ritmo": 1
  },
  {
   "id": "gabi-felismario-amor-eletronico",
@@ -174,7 +207,8 @@
   "dur": 105,
   "audio": "audio/gabi-felismario-amor-eletronico.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "gabi-felismario-por-que",
@@ -184,6 +218,8 @@
   "dur": 202,
   "audio": "audio/gabi-felismario-por-que.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -194,6 +230,8 @@
   "dur": 199,
   "audio": "audio/gabi-felismario-solteira-de-novo.mp3",
   "capa": null,
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -204,6 +242,8 @@
   "dur": 213,
   "audio": "audio/gabi-felismario-traidor-sem-edicao.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -214,6 +254,8 @@
   "dur": 175,
   "audio": "audio/luds-doesn-t-stop.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -224,7 +266,8 @@
   "dur": 260,
   "audio": "audio/luds-dominated.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "luds-it-s-morning",
@@ -234,7 +277,8 @@
   "dur": 170,
   "audio": "audio/luds-it-s-morning.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "topo",
+  "ritmo": 1
  },
  {
   "id": "luds-touch",
@@ -244,7 +288,8 @@
   "dur": 222,
   "audio": "audio/luds-touch.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-gira-que-gira",
@@ -254,6 +299,8 @@
   "dur": 240,
   "audio": "audio/king-gira-que-gira.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -264,6 +311,8 @@
   "dur": 91,
   "audio": "audio/king-pomba-gira-menina.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -274,6 +323,8 @@
   "dur": 344,
   "audio": "audio/king-pomba-gira-menina-versao-2.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -284,6 +335,8 @@
   "dur": 240,
   "audio": "audio/king-vem-me-ajudar-menina.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -294,6 +347,8 @@
   "dur": 265,
   "audio": "audio/king-carta-aberta.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -304,6 +359,8 @@
   "dur": 194,
   "audio": "audio/king-inalcancavel.mp3",
   "capa": null,
+  "cena": "fogo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -314,6 +371,8 @@
   "dur": 240,
   "audio": "audio/king-meu-vicio.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -324,6 +383,8 @@
   "dur": 154,
   "audio": "audio/king-voltei.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -333,7 +394,9 @@
   "genero": "Rock",
   "dur": 196,
   "audio": "audio/king-burning-desire.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-chasing-the-summit",
@@ -342,7 +405,9 @@
   "genero": "Rock",
   "dur": 189,
   "audio": "audio/king-chasing-the-summit.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "topo",
+  "ritmo": 1
  },
  {
   "id": "king-god-of-iron",
@@ -352,6 +417,8 @@
   "dur": 218,
   "audio": "audio/king-god-of-iron.mp3",
   "capa": null,
+  "cena": "fogo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -362,6 +429,8 @@
   "dur": 199,
   "audio": "audio/king-high-on-desire.mp3",
   "capa": null,
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -371,7 +440,9 @@
   "genero": "Rock",
   "dur": 235,
   "audio": "audio/king-invisible-masks.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "noite",
+  "ritmo": 1
  },
  {
   "id": "king-pumping-iron",
@@ -380,7 +451,9 @@
   "genero": "Rock",
   "dur": 110,
   "audio": "audio/king-pumping-iron.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-warrior-s-heart",
@@ -389,7 +462,9 @@
   "genero": "Rock",
   "dur": 192,
   "audio": "audio/king-warrior-s-heart.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-amor-que-se-foi",
@@ -399,6 +474,8 @@
   "dur": 204,
   "audio": "audio/king-amor-que-se-foi.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -409,6 +486,8 @@
   "dur": 186,
   "audio": "audio/king-mangueira-fraca.mp3",
   "capa": null,
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -419,6 +498,8 @@
   "dur": 213,
   "audio": "audio/king-paixao-sem-pudor.mp3",
   "capa": null,
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -429,6 +510,8 @@
   "dur": 156,
   "audio": "audio/king-traidora.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -439,6 +522,8 @@
   "dur": 202,
   "audio": "audio/king-velho-motel.mp3",
   "capa": null,
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -449,6 +534,8 @@
   "dur": 177,
   "audio": "audio/king-new-day.mp3",
   "capa": null,
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -458,7 +545,9 @@
   "genero": "Wicca",
   "dur": 160,
   "audio": "audio/king-ancient-ritual.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "ritual",
+  "ritmo": 1
  },
  {
   "id": "king-ceol-draiochta",
@@ -468,6 +557,8 @@
   "dur": 199,
   "audio": "audio/king-ceol-draiochta.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -478,6 +569,8 @@
   "dur": 214,
   "audio": "audio/king-noite-do-encanto.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -488,7 +581,8 @@
   "dur": 239,
   "audio": "audio/king-nos-iremos-voltar.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "ritual",
+  "ritmo": 1
  },
  {
   "id": "enoihd-aiarbmac-nega",
@@ -498,6 +592,8 @@
   "dur": 364,
   "audio": "audio/enoihd-aiarbmac-nega.mp3",
   "capa": "capas/enoihd-aiarbmac-nega.jpg",
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -508,6 +604,8 @@
   "dur": 205,
   "audio": "audio/enoihd-aiarbmac-de-volta-pro-passado.mp3",
   "capa": "capas/enoihd-aiarbmac-de-volta-pro-passado.jpg",
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -518,6 +616,8 @@
   "dur": 279,
   "audio": "audio/enoihd-aiarbmac-luxuria.mp3",
   "capa": "capas/enoihd-aiarbmac-luxuria.jpg",
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -528,6 +628,8 @@
   "dur": 178,
   "audio": "audio/enoihd-aiarbmac-ovelha.mp3",
   "capa": "capas/enoihd-aiarbmac-ovelha.jpg",
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -538,6 +640,8 @@
   "dur": 293,
   "audio": "audio/enoihd-aiarbmac-mercurio.mp3",
   "capa": "capas/enoihd-aiarbmac-mercurio.jpg",
+  "cena": "cosmos",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -548,6 +652,8 @@
   "dur": 244,
   "audio": "audio/enoihd-aiarbmac-so-brisa.mp3",
   "capa": "capas/enoihd-aiarbmac-so-brisa.jpg",
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -558,6 +664,8 @@
   "dur": 370,
   "audio": "audio/enoihd-aiarbmac-marte.mp3",
   "capa": "capas/enoihd-aiarbmac-marte.jpg",
+  "cena": "cosmos",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -568,6 +676,8 @@
   "dur": 167,
   "audio": "audio/enoihd-aiarbmac-viagem.mp3",
   "capa": "capas/enoihd-aiarbmac-viagem.jpg",
+  "cena": "fumaca",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -578,6 +688,8 @@
   "dur": 195,
   "audio": "audio/enoihd-aiarbmac-por-do-sol.mp3",
   "capa": "capas/enoihd-aiarbmac-por-do-sol.jpg",
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -588,6 +700,8 @@
   "dur": 167,
   "audio": "audio/enoihd-aiarbmac-metamorfose.mp3",
   "capa": "capas/enoihd-aiarbmac-metamorfose.jpg",
+  "cena": "cosmos",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -598,6 +712,8 @@
   "dur": 150,
   "audio": "audio/king-a-proposta.mp3",
   "capa": null,
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -608,6 +724,8 @@
   "dur": 278,
   "audio": "audio/king-everyone-is-so-alike.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -618,6 +736,8 @@
   "dur": 162,
   "audio": "audio/ben-viciado-em-ti.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -628,6 +748,8 @@
   "dur": 308,
   "audio": "audio/pedro-foda-se.mp3",
   "capa": null,
+  "cena": "neon",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -638,6 +760,8 @@
   "dur": 146,
   "audio": "audio/pedro-rotina.mp3",
   "capa": null,
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -648,7 +772,8 @@
   "dur": 179,
   "audio": "audio/king-kabum.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "festa",
+  "ritmo": 1
  },
  {
   "id": "gabi-felismario-traidor",
@@ -658,6 +783,8 @@
   "dur": 163,
   "audio": "audio/gabi-felismario-traidor.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -667,7 +794,9 @@
   "genero": "Sem gênero",
   "dur": 169,
   "audio": "audio/king-crazy-dreams.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "noite",
+  "ritmo": 1
  },
  {
   "id": "king-did-you-know",
@@ -676,7 +805,9 @@
   "genero": "Sem gênero",
   "dur": 181,
   "audio": "audio/king-did-you-know.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "cosmos",
+  "ritmo": 1
  },
  {
   "id": "king-fight-never-give-up",
@@ -685,7 +816,9 @@
   "genero": "Sem gênero",
   "dur": 129,
   "audio": "audio/king-fight-never-give-up.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-i-m-the-king",
@@ -694,7 +827,9 @@
   "genero": "Sem gênero",
   "dur": 131,
   "audio": "audio/king-i-m-the-king.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-powered",
@@ -703,7 +838,9 @@
   "genero": "Sem gênero",
   "dur": 105,
   "audio": "audio/king-powered.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-worst-enemy",
@@ -712,7 +849,9 @@
   "genero": "Sem gênero",
   "dur": 130,
   "audio": "audio/king-worst-enemy.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "luds-on-fire",
@@ -721,7 +860,9 @@
   "genero": "Sem gênero",
   "dur": 294,
   "audio": "audio/luds-on-fire.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "luds-three-hearts",
@@ -731,7 +872,8 @@
   "dur": 202,
   "audio": "audio/luds-three-hearts.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-gira-que-gira-versao-2",
@@ -741,6 +883,8 @@
   "dur": 277,
   "audio": "audio/king-gira-que-gira-versao-2.mp3",
   "capa": null,
+  "cena": "ritual",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -751,6 +895,8 @@
   "dur": 309,
   "audio": "audio/king-hipocritas.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -760,7 +906,9 @@
   "genero": "Rock",
   "dur": 119,
   "audio": "audio/king-let-s-toast.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "festa",
+  "ritmo": 1
  },
  {
   "id": "king-rumo-ao-topo",
@@ -770,6 +918,8 @@
   "dur": 285,
   "audio": "audio/king-rumo-ao-topo.mp3",
   "capa": null,
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -780,6 +930,8 @@
   "dur": 163,
   "audio": "audio/king-o-cravo-e-a-rosa.mp3",
   "capa": null,
+  "cena": "amor",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -790,6 +942,8 @@
   "dur": 191,
   "audio": "audio/king-por-que.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -800,7 +954,8 @@
   "dur": 179,
   "audio": "audio/king-proposta.mp3",
   "capa": null,
-  "letra": 1
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-solteiro-de-novo",
@@ -810,6 +965,8 @@
   "dur": 191,
   "audio": "audio/king-solteiro-de-novo.mp3",
   "capa": null,
+  "cena": "festa",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -819,7 +976,9 @@
   "genero": "R&B",
   "dur": 241,
   "audio": "audio/king-african-goddess.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "ritual",
+  "ritmo": 1
  },
  {
   "id": "king-cash-signs",
@@ -828,7 +987,9 @@
   "genero": "R&B",
   "dur": 146,
   "audio": "audio/king-cash-signs.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "neon",
+  "ritmo": 1
  },
  {
   "id": "king-my-temptation",
@@ -837,7 +998,9 @@
   "genero": "R&B",
   "dur": 195,
   "audio": "audio/king-my-temptation.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-our-little-secret",
@@ -846,7 +1009,9 @@
   "genero": "R&B",
   "dur": 224,
   "audio": "audio/king-our-little-secret.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-our-refuge",
@@ -855,7 +1020,9 @@
   "genero": "R&B",
   "dur": 180,
   "audio": "audio/king-our-refuge.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "king-aries",
@@ -864,7 +1031,9 @@
   "genero": "R&B",
   "dur": 187,
   "audio": "audio/king-aries.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "amor",
+  "ritmo": 1
  },
  {
   "id": "enoihd-aiarbmac-viver",
@@ -874,6 +1043,8 @@
   "dur": 399,
   "audio": "audio/enoihd-aiarbmac-viver.mp3",
   "capa": "capas/enoihd-aiarbmac-viver.jpg",
+  "cena": "topo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -884,6 +1055,8 @@
   "dur": 185,
   "audio": "audio/enoihd-aiarbmac-minha-coroa.mp3",
   "capa": null,
+  "cena": "fogo",
+  "ritmo": 1,
   "letra": 1
  },
  {
@@ -893,7 +1066,9 @@
   "genero": "Sem gênero",
   "dur": 183,
   "audio": "audio/king-number-1.mp3",
-  "capa": null
+  "capa": null,
+  "cena": "fogo",
+  "ritmo": 1
  },
  {
   "id": "king-hipocritas-do-lado-1",
@@ -903,6 +1078,8 @@
   "dur": 175,
   "audio": "audio/king-hipocritas-do-lado-1.mp3",
   "capa": null,
+  "cena": "chuva",
+  "ritmo": 1,
   "letra": 1
  }
 ]
