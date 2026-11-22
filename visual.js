@@ -510,7 +510,7 @@ function montarLinha(i) {
   $v('#mvProx').textContent = prox ? prox[1] : '';
   $v('#mvAtual').classList.remove('entra'); void $v('#mvAtual').offsetWidth; $v('#mvAtual').classList.add('entra');
   if (atual && jornada) Mundo.linha(atual);
-  if (atual) for (const [re, tipo] of GATILHOS) if (re.test(atual)) {
+  if (atual && !jornada) for (const [re, tipo] of GATILHOS) if (re.test(atual)) {
     soltar(tipo, tipo === 'raio' ? 1 : tipo === 'fumaca' ? 4 : 14, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? null : W / 2, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? -10 : H * 0.62);
   }
 }

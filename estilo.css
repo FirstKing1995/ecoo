@@ -442,6 +442,7 @@ p.agora .pontos i:nth-child(2) { animation-delay: .2s; } p.agora .pontos i:nth-c
 .modo-visual.quieto { cursor: none; }
 .mv-letra { position: absolute; left: 0; right: 0; bottom: 18%; padding: 0 24px; text-align: center; pointer-events: none; transition: bottom .5s; }
 .modo-visual.quieto .mv-letra { bottom: 12%; }
+.modo-visual.jornada.quieto .mv-letra { bottom: 7%; }
 .mv-letra.sem { display: none; }
 .mv-atual { margin: 0 auto; max-width: 900px; font-size: clamp(26px, 5.2vw, 56px); font-weight: 800; line-height: 1.15; text-shadow: 0 2px 18px rgba(0,0,0,.6);
   transform: scale(calc(1 + var(--mv-pulso) * .035)); }
