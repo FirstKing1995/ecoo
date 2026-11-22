@@ -44,7 +44,7 @@ let M = null, R = null, cena = null, nomeCena = '', batidaIdx = -1, pulso = 0, f
 let matiz = 0, energiaLenta = 0, letraDados = null, linhaIdx = -2;
 // Jornada (mundo.js, em WebGL) ou cenas classicas; a pessoa escolhe no botao do topo e fica lembrado
 let jornada = false;
-function preferido() { try { return localStorage.getItem('ecoo.estilo') || 'jornada'; } catch { return 'jornada'; } }
+function preferido() { try { return localStorage.getItem('ecoo.estilo') || 'classico'; } catch { return 'classico'; } }
 const parts = [];
 
 // ---------- ritmo ----------
@@ -159,6 +159,13 @@ function moverParticulas(dt) {
         ctx.save(); ctx.translate(p.x, p.y); ctx.scale(Math.cos(p.vida * 7), 1); ctx.globalAlpha = Math.min(1, k * 2);
         ctx.fillStyle = '#f5c84c'; ctx.beginPath(); ctx.arc(0, 0, p.r, 0, 7); ctx.fill();
         ctx.fillStyle = '#b8860b'; ctx.beginPath(); ctx.arc(0, 0, p.r * 0.62, 0, 7); ctx.fill(); ctx.restore(); break;
+      case 'vetor': {
+        if (p.modo === 'explode') { p.vx *= 0.96; p.vy = p.vy * 0.96 - 10 * dt; }
+        else if (p.modo === 'sobe') p.x += Math.sin(p.vida * 0.9 + p.r) * 14 * dt;
+        const al = p.modo === 'sobe' ? p.a * Math.min(1, p.vida, (p.max - p.vida)) : Math.min(1, k * 2.5);
+        const r = p.r * (1 + 0.25 * pulso) * (p.modo === 'explode' ? 0.7 + 0.3 * Math.min(1, p.vida * 4) : 1);
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang); ctx.globalAlpha = Math.max(0, al);
+        ctx.drawImage(vetor(p.nome, p.h), -r * 2, -r * 2, r * 4, r * 4); ctx.restore(); break; }
       case 'raio': {
         const a = Math.sin(k * Math.PI) * 0.35; ctx.save(); ctx.translate(p.x, p.y); ctx.globalCompositeOperation = 'lighter';
         for (let j = 0; j < 12; j++) { ctx.rotate(Math.PI / 6); ctx.fillStyle = `hsla(45,100%,70%,${a * 0.5})`; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(p.r, -p.r * 0.05); ctx.lineTo(p.r, p.r * 0.05); ctx.fill(); }
@@ -166,6 +173,138 @@ function moverParticulas(dt) {
     }
   }
   ctx.globalAlpha = 1;
+}
+
+// ---------- desenhos vetoriais (vetores.js) que viram particulas ----------
+const VET = window.VETORES || {};
+const vetCache = new Map(), vetPath = {};
+function vetor(nome, h, l = 72) { // desenho pre-renderizado com brilho em volta
+  const k = nome + '|' + hq(h) + '|' + l;
+  let c = vetCache.get(k); if (c) return c;
+  c = document.createElement('canvas'); c.width = c.height = 96;
+  const g = c.getContext('2d');
+  g.globalAlpha = 0.5; g.drawImage(brilho(hq(h), 95, l - 12), 0, 0, 96, 96); g.globalAlpha = 1;
+  g.translate(48, 48); g.scale(2.7, 2.7); g.translate(-12, -12);
+  g.lineWidth = 2; g.lineCap = 'round'; g.lineJoin = 'round';
+  const p = vetPath[nome] || (vetPath[nome] = new Path2D(VET[nome] || 'M4 12h16'));
+  g.strokeStyle = `hsl(${hq(h)},95%,${Math.min(92, l + 14)}%)`; g.stroke(p);
+  if (vetCache.size > 400) vetCache.clear();
+  vetCache.set(k, c); return c;
+}
+// desenhos de cada cena (variam a cada trecho da musica)
+const TEMAS = {
+  festa: ['music', 'music-2', 'music-4', 'disc-3', 'party-popper', 'sparkles', 'headphones', 'martini', 'mic-vocal'],
+  fumaca: ['leaf', 'feather', 'wind', 'cloud', 'sprout', 'clover', 'flower-2'],
+  amor: ['heart', 'heart-pulse', 'flower', 'flower-2', 'sparkle', 'cherry', 'infinity', 'origami'],
+  chuva: ['droplet', 'droplets', 'cloud-rain', 'umbrella', 'waves', 'fish', 'shell'],
+  noite: ['moon', 'moon-star', 'star', 'sparkle', 'sparkles', 'cat', 'eye'],
+  fogo: ['flame', 'flame-kindling', 'zap', 'skull', 'hand-metal', 'guitar', 'drum'],
+  ritual: ['eye', 'moon-star', 'gem', 'diamond', 'hexagon', 'triangle', 'asterisk', 'key', 'spade', 'club'],
+  cosmos: ['orbit', 'rocket', 'satellite', 'atom', 'star', 'sparkle', 'ghost'],
+  topo: ['sun', 'sunrise', 'bird', 'mountain', 'leaf', 'feather', 'footprints'],
+  neon: ['zap', 'gamepad-2', 'headphones', 'audio-lines', 'radio', 'dice-5', 'glasses', 'music-3'],
+};
+const NOTAS = ['music', 'music-2', 'music-3', 'music-4'];
+// palavras da letra que soltam desenhos (junto com os efeitos de antes)
+const VET_LETRA = { coracao: ['heart', 'heart-pulse', 'flower'], faisca: ['flame', 'zap', 'flame-kindling'], estrela: ['star', 'sparkle', 'moon-star'], gota: ['droplet', 'umbrella', 'waves'],
+  confete: ['party-popper', 'music', 'martini', 'wine'], fumaca: ['leaf', 'wind', 'cloud', 'feather'], moeda: ['crown', 'gem', 'diamond'], raio: ['sun', 'sunrise', 'rainbow'] };
+const sorteia = l => l[Math.floor(Math.random() * l.length)];
+function soltarVetor(lista, n, x, y, modo = 'explode', forca = 1) {
+  for (let i = 0; i < n && parts.length < limiteParts; i++) {
+    const ang = rnd(0, Math.PI * 2), v = rnd(90, 280) * forca;
+    const p = { tipo: 'vetor', nome: sorteia(lista), x: x ?? rnd(0, W), y: y ?? rnd(0, H), vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, vida: 0, max: rnd(1.6, 2.8),
+      r: rnd(14, 26) * forca, giro: rnd(-1.5, 1.5), ang: rnd(-0.4, 0.4), h: matiz + rnd(-50, 50), modo };
+    if (modo === 'sobe') { p.x = x ?? rnd(0, W); p.y = y ?? H + 30; p.vx = rnd(-15, 15); p.vy = rnd(-60, -25); p.max = rnd(6, 10); p.r = rnd(10, 20); p.giro = rnd(-0.4, 0.4); p.a = rnd(0.35, 0.6); }
+    if (modo === 'cai') { p.y = y ?? -30; p.vx = rnd(-40, 40); p.vy = rnd(120, 260); p.max = 4; }
+    parts.push(p);
+  }
+}
+
+// ---------- a batida aparecendo na tela ----------
+const NB = 48, banda = new Float32Array(NB), envB = new Float32Array(NB);
+let estiloBatida = 'barras', contador = 0, borda = 0;
+const ESTILOS = ['barras', 'anel', 'onda'];
+function batidaVisivel(gb, forte) {
+  for (let k = 0; k < NB; k++) {
+    const grave = k < NB * 0.3, v = grave ? 0.55 + 0.45 * gb : rnd(0.25, 1);
+    envB[k] = Math.max(envB[k], v * (forte ? 1 : 0.7) * rnd(0.7, 1));
+  }
+  contador = batidaIdx % 4; if (forte) borda = 1;
+}
+function desenharBatida(dt, e, g, a) {
+  const kd = Math.exp(-dt * 6.5);
+  for (let k = 0; k < NB; k++) {
+    envB[k] *= kd;
+    const d = k / NB, base = d < 0.3 ? g : d < 0.7 ? e : a;
+    const alvo = base * (0.2 + 0.8 * envB[k]) + 0.04 * Math.sin(performance.now() / 300 + k);
+    banda[k] += (alvo - banda[k]) * Math.min(1, dt * 18);
+  }
+  ctx.globalCompositeOperation = 'lighter';
+  if (estiloBatida === 'barras') { // barras espelhadas saindo do centro de baixo
+    const n = NB / 2, bw = W / (n * 2), hmax = H * 0.2;
+    for (let k = 0; k < n; k++) {
+      const v = banda[k * 2], hgt = Math.max(3, v * hmax), h = (matiz + k * 7) % 360;
+      ctx.fillStyle = `hsla(${h},95%,62%,${0.28 + 0.4 * v})`;
+      for (const lado of [-1, 1]) { const x = W / 2 + lado * (k + 0.5) * bw - bw * 0.35; ctx.fillRect(x, H - hgt, bw * 0.7, hgt); }
+      if (v > 0.55) for (const lado of [-1, 1]) luz(W / 2 + lado * (k + 0.5) * bw, H - hgt, bw * 1.4, h, 95, 65, (v - 0.5) * 0.8);
+    }
+  } else if (estiloBatida === 'anel') { // anel de barras em volta do centro
+    const cx = W / 2, cy = H * 0.42, r0 = Math.min(W, H) * (0.27 + 0.03 * pulso), comp = Math.min(W, H) * 0.16;
+    ctx.lineCap = 'round'; ctx.lineWidth = Math.max(2, Math.min(W, H) * 0.008);
+    for (let k = 0; k < NB * 2; k++) {
+      const v = banda[k < NB ? k : NB * 2 - 1 - k], ang = k / (NB * 2) * Math.PI * 2 - Math.PI / 2 + performance.now() / 9000;
+      const c = Math.cos(ang), s = Math.sin(ang), l = 4 + v * comp;
+      ctx.strokeStyle = `hsla(${(matiz + k * 4) % 360},95%,65%,${0.3 + 0.5 * v})`;
+      ctx.beginPath(); ctx.moveTo(cx + c * r0, cy + s * r0); ctx.lineTo(cx + c * (r0 + l), cy + s * (r0 + l)); ctx.stroke();
+    }
+    ctx.strokeStyle = `hsla(${matiz},90%,70%,${0.15 + 0.5 * pulso})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r0 * 0.96, 0, 7); ctx.stroke();
+  } else { // onda: duas linhas de luz que pulam com a batida
+    const y0 = H * 0.68;
+    for (const k2 of [1, -1]) {
+      ctx.strokeStyle = `hsla(${(matiz + (k2 > 0 ? 0 : 120)) % 360},95%,65%,${0.35 + 0.4 * pulso})`; ctx.lineWidth = 2.5; ctx.beginPath();
+      for (let i = 0; i <= NB; i++) {
+        const x = i / NB * W, v = banda[Math.min(NB - 1, Math.abs(Math.round(NB / 2 - i)) * 2 % NB)];
+        const y = y0 + k2 * v * H * 0.12 * Math.sin(i * 0.7 + performance.now() / 260);
+        ctx[i ? 'lineTo' : 'moveTo'](x, y);
+      }
+      ctx.stroke();
+    }
+  }
+  // contador 1-2-3-4 da batida
+  const cy = H - Math.max(26, H * 0.045), gap = 22;
+  for (let k = 0; k < 4; k++) {
+    const on = k === contador, x = W / 2 + (k - 1.5) * gap;
+    luz(x, cy, on ? 14 + 10 * pulso : 6, matiz + k * 30, 95, on ? 70 : 45, on ? 0.9 : 0.35);
+  }
+  // borda que acende nas batidas fortes
+  if (borda > 0.01) {
+    const gr = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.45, W / 2, H / 2, Math.max(W, H) * 0.75);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `hsla(${matiz},95%,60%,${0.35 * borda})`);
+    ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H); borda = Math.max(0, borda - dt * 3);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// ---------- trechos: a cena muda ao longo da musica ----------
+const GRUPO = { festa: ['neon', 'cosmos', 'fogo'], fumaca: ['noite', 'cosmos', 'topo'], amor: ['noite', 'topo', 'fumaca'], chuva: ['noite', 'fumaca', 'amor'],
+  noite: ['cosmos', 'chuva', 'fumaca'], fogo: ['ritual', 'festa', 'neon'], ritual: ['fogo', 'cosmos', 'noite'], cosmos: ['noite', 'neon', 'ritual'],
+  topo: ['fumaca', 'amor', 'cosmos'], neon: ['festa', 'cosmos', 'fogo'] };
+let sequencia = [], secao = 0, batidasSecao = 0, energiaSecao = 0.5, cenaAtual = '', foto = null, fade = 0, ambiente = 0;
+function montarSequencia(principal) {
+  const g = GRUPO[principal] || [];
+  sequencia = [principal]; g.forEach(c => sequencia.push(c, principal)); // a cena da musica volta sempre entre as outras
+  secao = 0; batidasSecao = 0;
+}
+function trocarSecao() {
+  if (!sequencia.length) return;
+  if (!foto) foto = document.createElement('canvas');
+  foto.width = tela.width; foto.height = tela.height; foto.getContext('2d').drawImage(tela, 0, 0); fade = 1;
+  secao++; batidasSecao = 0; energiaSecao = energiaLenta;
+  cenaAtual = sequencia[secao % sequencia.length]; cena = CENAS[cenaAtual]();
+  estiloBatida = ESTILOS[(secao + (M ? M.id.length : 0)) % ESTILOS.length];
+  matiz = (matiz + 70 + rnd(0, 80)) % 360;
+  if (!jornada) $v('#mvCena').textContent = NOMES[cenaAtual];
+  soltarVetor(TEMAS[cenaAtual] || NOTAS, 10, W / 2, H * 0.45, 'explode', 1.1);
 }
 
 // ---------- cenas ----------
@@ -511,6 +650,7 @@ function montarLinha(i) {
   $v('#mvAtual').classList.remove('entra'); void $v('#mvAtual').offsetWidth; $v('#mvAtual').classList.add('entra');
   if (atual && jornada) Mundo.linha(atual);
   if (atual && !jornada) for (const [re, tipo] of GATILHOS) if (re.test(atual)) {
+    soltarVetor(VET_LETRA[tipo] || NOTAS, 8, W / 2, H * 0.45, 'explode', 1.2);
     soltar(tipo, tipo === 'raio' ? 1 : tipo === 'fumaca' ? 4 : 14, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? null : W / 2, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? -10 : H * 0.62);
   }
 }
@@ -532,7 +672,7 @@ function redimensionar() {
   DPR = Math.max(0.4, Math.min(window.devicePixelRatio || 1, W * H > 1.2e6 ? 1 : 1.5) * escala);
   tela.width = Math.round(W * DPR); tela.height = Math.round(H * DPR);
   limiteParts = Math.round(420 * Math.min(1, escala));
-  if (nomeCena && (mudou || !cena)) cena = CENAS[nomeCena]();
+  if (cenaAtual && (mudou || !cena)) cena = CENAS[cenaAtual]();
   if (window.Mundo) Mundo.tamanho(W, H, escala);
 }
 function medirFluidez(intervalo) {
@@ -569,7 +709,13 @@ function passo(agora) {
       const gb = R.g ? amostra(R.g, B[i]) : 0.6;
       forcaBatida = gb; pulso = 0.4 + 0.6 * gb;
       const forte = gb > 0.55 || i % 4 === 0;
-      if (jornada) Mundo.batida(gb, forte); else cena.batida(gb, forte);
+      if (jornada) Mundo.batida(gb, forte);
+      else {
+        cena.batida(gb, forte); batidaVisivel(gb, forte); batidasSecao++;
+        if (forte && Math.random() < 0.5) soltarVetor(NOTAS.concat(TEMAS[cenaAtual] || []), forte && gb > 0.7 ? 3 : 1, W / 2, H * 0.42, 'explode', 0.8);
+        // muda de cena a cada ~32 batidas, ou antes se a musica mudar de energia
+        if (i % 4 === 0 && (batidasSecao >= 32 || (batidasSecao >= 16 && Math.abs(energiaLenta - energiaSecao) > 0.22))) trocarSecao();
+      }
     }
   }
   pulso = Math.max(0, pulso - dt * 4.2);
@@ -579,6 +725,10 @@ function passo(agora) {
   else {
     if (tremor > 0) { ctx.translate(rnd(-tremor, tremor), rnd(-tremor, tremor)); tremor = Math.max(0, tremor - dt * 40); }
     cena.desenhar(dt, t, e, g, a);
+    // a cena anterior some aos poucos por cima da nova
+    if (fade > 0 && foto) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = fade; ctx.drawImage(foto, 0, 0); ctx.restore(); fade = Math.max(0, fade - dt / 1.3); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+    desenharBatida(dt, e, g, a);
+    ambiente -= dt; if (ambiente <= 0) { ambiente = rnd(0.6, 1.4) / (0.6 + e); soltarVetor(TEMAS[cenaAtual] || NOTAS, 1, null, null, 'sobe'); }
   }
   moverParticulas(dt);
   if (flash > 0) { ctx.fillStyle = `rgba(${flashCor},${flash})`; ctx.fillRect(-20, -20, W + 40, H + 40); flash = Math.max(0, flash - dt * 1.5); }
@@ -603,7 +753,7 @@ async function prepararMusica() {
   if (!m) return;
   M = m; R = null; batidaIdx = -1; linhaIdx = -2; letraDados = null; parts.length = 0;
   nomeCena = (catalogo.cenas || {})[m.id] || m.cena || CENAS_GENERO[m.genero] || 'neon';
-  cena = CENAS[nomeCena]();
+  montarSequencia(nomeCena); cenaAtual = nomeCena; cena = CENAS[cenaAtual](); estiloBatida = ESTILOS[m.id.length % ESTILOS.length]; fade = 0; envB.fill(0);
   jornada = !!(window.Mundo && preferido() === 'jornada' && Mundo.disponivel());
   if (window.Mundo) Mundo.ligar(jornada);
   $v('#mvTitulo').textContent = m.titulo; $v('#mvArtista').textContent = m.artista;
@@ -670,5 +820,6 @@ document.addEventListener('visibilitychange', async () => {
 const antes = window.aoTrocarMusica;
 window.aoTrocarMusica = m => { if (antes) antes(m); if (aberto) prepararMusica(); };
 window.abrirVisual = abrirVisual;
+window._trocarSecao = trocarSecao; // para testar
 window.addEventListener('popstate', () => { if (aberto) fecharVisual(true); });
 })();
