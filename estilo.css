@@ -423,14 +423,15 @@ p.agora .pontos i:nth-child(2) { animation-delay: .2s; } p.agora .pontos i:nth-c
 /* Modo visual (tela cheia com animacao no ritmo) */
 .modo-visual { position: fixed; inset: 0; z-index: 70; background: #000; overflow: hidden; color: #fff; --mv-pulso: 0; }
 .modo-visual[hidden] { display: none; }
-#mvTela { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#mvTela, #mvMundo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#mvMundo[hidden] { display: none; }
 .mv-topo, .mv-baixo { position: absolute; left: 0; right: 0; padding: max(14px, env(safe-area-inset-top)) 18px 14px; display: flex; align-items: center; gap: 12px; transition: opacity .5s, transform .5s; }
 .mv-topo { top: 0; background: linear-gradient(rgba(0,0,0,.45), transparent); }
 .mv-topo .ico { color: #fff; }
 .mv-nome { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .mv-nome strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mv-nome span { font-size: 12px; opacity: .75; }
-.mv-cena { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 4px 10px; opacity: .85; }
+.mv-cena { background: rgba(0,0,0,.25); color: #fff; font-family: inherit; cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 4px 10px; opacity: .85; }
 .mv-baixo { bottom: 0; flex-direction: column; padding: 14px 18px max(18px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(0,0,0,.5)); }
 .mv-baixo input { width: 100%; max-width: 720px; flex: none; }
 .mv-botoes { display: flex; align-items: center; gap: 22px; }

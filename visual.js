@@ -25,7 +25,7 @@ document.body.insertAdjacentHTML('beforeend', `
   <div class="mv-topo">
     <button class="ico" id="mvFechar" aria-label="Sair do modo visual"><i data-lucide="minimize-2"></i></button>
     <div class="mv-nome"><strong id="mvTitulo"></strong><span id="mvArtista"></span></div>
-    <span class="mv-cena" id="mvCena"></span>
+    <button class="mv-cena" id="mvCena" title="Trocar entre a Jornada e as cenas clássicas"></button>
   </div>
   <div class="mv-letra" id="mvLetra" aria-live="off"><p class="mv-atual" id="mvAtual"></p><p class="mv-prox" id="mvProx"></p></div>
   <div class="mv-baixo">
@@ -42,6 +42,9 @@ const tela = $v('#mvTela'), ctx = tela.getContext('2d');
 let W = 0, H = 0, DPR = 1, quadro = 0, ultimo = 0, aberto = false, ocultarEm = 0, travaTela = null;
 let M = null, R = null, cena = null, nomeCena = '', batidaIdx = -1, pulso = 0, forcaBatida = 0, tremor = 0, flash = 0, flashCor = '255,255,255';
 let matiz = 0, energiaLenta = 0, letraDados = null, linhaIdx = -2;
+// Jornada (mundo.js, em WebGL) ou cenas classicas; a pessoa escolhe no botao do topo e fica lembrado
+let jornada = false;
+function preferido() { try { return localStorage.getItem('ecoo.estilo') || 'jornada'; } catch { return 'jornada'; } }
 const parts = [];
 
 // ---------- ritmo ----------
@@ -506,6 +509,7 @@ function montarLinha(i) {
   $v('#mvAtual').innerHTML = atual ? atual.split(/\s+/).map(w => `<span>${esc(w)}</span>`).join(' ') : '';
   $v('#mvProx').textContent = prox ? prox[1] : '';
   $v('#mvAtual').classList.remove('entra'); void $v('#mvAtual').offsetWidth; $v('#mvAtual').classList.add('entra');
+  if (atual && jornada) Mundo.linha(atual);
   if (atual) for (const [re, tipo] of GATILHOS) if (re.test(atual)) {
     soltar(tipo, tipo === 'raio' ? 1 : tipo === 'fumaca' ? 4 : 14, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? null : W / 2, tipo === 'confete' || tipo === 'moeda' || tipo === 'gota' ? -10 : H * 0.62);
   }
@@ -529,12 +533,14 @@ function redimensionar() {
   tela.width = Math.round(W * DPR); tela.height = Math.round(H * DPR);
   limiteParts = Math.round(420 * Math.min(1, escala));
   if (nomeCena && (mudou || !cena)) cena = CENAS[nomeCena]();
+  if (window.Mundo) Mundo.tamanho(W, H, escala);
 }
 function medirFluidez(intervalo) {
   if (document.hidden || intervalo > 200) return;
   somaQuadros += intervalo; nQuadros++;
   if (nQuadros < 90) return;
   const media = somaQuadros / nQuadros; somaQuadros = 0; nQuadros = 0;
+  if (jornada && media > 45 && escala <= 0.45) { jornada = false; Mundo.ligar(false); $v('#mvCena').textContent = NOMES[nomeCena]; return; } // nem assim: volta para as cenas leves
   if (media > 24 && escala > 0.45) { escala *= 0.75; baixou++; redimensionar(); }        // abaixo de ~40 quadros/s: alivia
   else if (media < 17.5 && escala < 1 && baixou < 2) { escala = Math.min(1, escala / 0.85); redimensionar(); } // sobrando: melhora
 }
@@ -563,19 +569,24 @@ function passo(agora) {
       const gb = R.g ? amostra(R.g, B[i]) : 0.6;
       forcaBatida = gb; pulso = 0.4 + 0.6 * gb;
       const forte = gb > 0.55 || i % 4 === 0;
-      cena.batida(gb, forte);
+      if (jornada) Mundo.batida(gb, forte); else cena.batida(gb, forte);
     }
   }
   pulso = Math.max(0, pulso - dt * 4.2);
   // tela
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  if (tremor > 0) { ctx.translate(rnd(-tremor, tremor), rnd(-tremor, tremor)); tremor = Math.max(0, tremor - dt * 40); }
-  cena.desenhar(dt, t, e, g, a);
+  if (jornada) { ctx.clearRect(-20, -20, W + 40, H + 40); Mundo.quadro(dt, t, e, g, a, pulso, ctx, W, H, !audio.paused); }
+  else {
+    if (tremor > 0) { ctx.translate(rnd(-tremor, tremor), rnd(-tremor, tremor)); tremor = Math.max(0, tremor - dt * 40); }
+    cena.desenhar(dt, t, e, g, a);
+  }
   moverParticulas(dt);
   if (flash > 0) { ctx.fillStyle = `rgba(${flashCor},${flash})`; ctx.fillRect(-20, -20, W + 40, H + 40); flash = Math.max(0, flash - dt * 1.5); }
-  // vinheta
+  // vinheta (a Jornada ja faz a sua)
+  if (!jornada) {
   const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
   vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.55)'); ctx.fillStyle = vg; ctx.fillRect(-20, -20, W + 40, H + 40);
+  }
   // letra
   const li = linhaAgora(t);
   if (li !== linhaIdx) { linhaIdx = li; montarLinha(li); }
@@ -593,11 +604,14 @@ async function prepararMusica() {
   M = m; R = null; batidaIdx = -1; linhaIdx = -2; letraDados = null; parts.length = 0;
   nomeCena = (catalogo.cenas || {})[m.id] || m.cena || CENAS_GENERO[m.genero] || 'neon';
   cena = CENAS[nomeCena]();
+  jornada = !!(window.Mundo && preferido() === 'jornada' && Mundo.disponivel());
+  if (window.Mundo) Mundo.ligar(jornada);
   $v('#mvTitulo').textContent = m.titulo; $v('#mvArtista').textContent = m.artista;
-  $v('#mvCena').textContent = NOMES[nomeCena];
+  $v('#mvCena').textContent = jornada ? 'Jornada' : NOMES[nomeCena];
   $v('#mvAtual').innerHTML = ''; $v('#mvProx').textContent = '';
   const [r, l] = await Promise.all([carregarRitmo(m), typeof letraDe === 'function' ? letraDe(m) : null]);
   if (M !== m) return;
+  if (jornada) Mundo.preparar({ id: m.id, R: r, letra: l, humor: nomeCena, duracao: (isFinite(audio.duration) && audio.duration) || m.dur || (r.batidas[r.batidas.length - 1] || 236) + 4 });
   R = r; letraDados = l;
   $v('#mvLetra').classList.toggle('sem', !l);
 }
@@ -633,6 +647,11 @@ $('#bFila').insertAdjacentHTML('beforebegin', '<button class="ico" id="bVisual" 
 $('#tcCompartilhar').insertAdjacentHTML('beforebegin', '<button class="ico" id="tcVisual" aria-label="Modo visual em tela cheia"><i data-lucide="sparkles"></i></button>');
 ['#bVisual', '#tcVisual'].forEach(s => $(s).addEventListener('click', abrirVisual));
 $v('#mvFechar').addEventListener('click', fecharVisual);
+$v('#mvCena').addEventListener('click', () => {
+  try { localStorage.setItem('ecoo.estilo', jornada ? 'classico' : 'jornada'); } catch {}
+  if (!jornada && !(window.Mundo && Mundo.disponivel())) { aviso('Este aparelho não tem WebGL: fica com as cenas clássicas.'); return; }
+  prepararMusica(); aviso(jornada ? 'Jornada: a música vira uma história.' : 'Cenas clássicas.');
+});
 $v('#mvPlay').addEventListener('click', () => { alternar(); });
 $v('#mvAnterior').addEventListener('click', anterior);
 $v('#mvProxima').addEventListener('click', () => proxima());
